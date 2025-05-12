@@ -191,12 +191,16 @@ class Products(models.Model):
 
 
 class Customer(models.Model):
+    
     date = models.DateTimeField(default=timezone.now, blank=True)
     status = models.CharField(max_length=255, blank=True, default='Active')
     customer_name = models.CharField(max_length=255, null=False)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
     comments = models.TextField(blank=True)
+    economic_code = models.CharField("کد اقتصادی خریدار", max_length=15, blank=True, null=True) #new by darbandi
+    postcode = models.CharField("کد پستی خریدار", max_length=10, blank=True, null=True) #new by darbandi
+    national_id = models.CharField("شناسه ملی خریدار", max_length=50, blank=True, null=True) #new by darbandi
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -359,7 +363,7 @@ class Sales(models.Model):
     date = models.DateTimeField(default=timezone.now, null=True)
     status = models.CharField(max_length=255, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], null=True)
     payment_date = models.DateTimeField(null=True)
-    customer_name = models.CharField(max_length=255, null=False)
+    customer_name = models.ForeignKey(Customer, related_name='sales', on_delete=models.CASCADE)
     license_number = models.CharField(max_length=255, null=True)
     list_of_reels = models.TextField(null=True)
     width = models.IntegerField(null=True, blank=True)
@@ -388,7 +392,7 @@ class Sales(models.Model):
         verbose_name_plural = "Sales"
 
     def __str__(self):
-        return f"Sale (ID: {self.id}, Date: {self.date}, Customer: {self.customer})"
+        return f"Sale (ID: {self.id}, Date: {self.date}, Customer: {self.customer_name})"
 
 
 class AnbarGeneric(models.Model):
