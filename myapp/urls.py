@@ -52,7 +52,6 @@ urlpatterns = [
     path("api/reportProducts", report_Products),
     path("api/reportConsumption", report_Consumption),
     path("api/reportAlert", report_Alert),
-    path("api/generate-purchase-order-pdf/", generate_purchase_order_pdf),
     path("api/latest-pending-sale/", latest_pending_sale),
     path("api/simple-latest-pending-sale/", simple_latest_pending_sale),
     path("api/confirm-sales-invoice/<int:sales_id>/", confirm_sales_invoice),
@@ -77,21 +76,14 @@ urlpatterns = [
     path("weightStationPanel/", weight_station_panel),
     path("updateWeight1/", update_weight1),
     path("updateWeight2/", update_weight2),
-    path("createPurchaseOrder/", create_purchase_order),
     path("createSalesOrder/", create_sales_order),
     path("forkliftPanel/", forklift_panel),
     path("cancel/", cancel),
     path("report/", report_page),
     path("test-api/", lambda request: render(request, 'test_api.html')),
 
-    
-    path("api/havaleh-pdf/", havaleh, name='havaleh-pdf'),
-    
-
     path("invoice/", invoice_page),
-    path("invoice/havaleh", havaleh),
     path("api/sales-order-pdf/", sales_order, name='sales-order-pdf'),
     path("invoice/sales-order", sales_order),
-    path("invoice/Purchases/", Purchases),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
