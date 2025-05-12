@@ -53,6 +53,12 @@ urlpatterns = [
     path("api/reportConsumption", report_Consumption),
     path("api/reportAlert", report_Alert),
     path("api/generate-purchase-order-pdf/", generate_purchase_order_pdf),
+    path("api/latest-pending-sale/", latest_pending_sale),
+    path("api/simple-latest-pending-sale/", simple_latest_pending_sale),
+    path("api/confirm-sales-invoice/<int:sales_id>/", confirm_sales_invoice),
+    path("api/confirm-sales-invoice/", confirm_sales_invoice),
+    path("api/test-endpoint/", test_api),
+    path("api/create-test-sale/", create_test_sale),
     path("ProductsPage/", products_page),
 
     # Following paths are related to Pages:
@@ -76,6 +82,7 @@ urlpatterns = [
     path("forkliftPanel/", forklift_panel),
     path("cancel/", cancel),
     path("report/", report_page),
+    path("test-api/", lambda request: render(request, 'test_api.html')),
 
     
     path("api/havaleh-pdf/", havaleh, name='havaleh-pdf'),

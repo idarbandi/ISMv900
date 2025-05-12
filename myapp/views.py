@@ -13,6 +13,8 @@ from django.apps import apps
 from django.db import models
 from django.apps import apps
 from django.db.models.base import ModelBase
+from django.http import JsonResponse
+from .models import Sales
 import jdatetime
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -23,6 +25,9 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.http import HttpResponse
 import base64
+
+from django.views.decorators.csrf import csrf_exempt
+import json
 from django.contrib import admin
 from django.http import JsonResponse
 import pandas as pd
@@ -3543,3 +3548,34 @@ def products_page(request):
             return render(request, 'products_page.html')
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+def get_next_sales_invoice(request):
+    # You may want to filter by user: e.g. username=request.user.username
+    sales = Sales.objects.filter(invoice_status="NA").order_by('date').first()
+    if not sales:
+        return JsonResponse({'error': 'No pending sales'}, status=404)
+    # Serialize required fields
+    data = {
+        'id': sales.id,
+        'customer_name': sales.customer_name,
+        'license_number': sales.license_number,
+        # ...add all fields you need for the invoice
+        'items': [],  # If you have related items, serialize them too
+    }
+    return JsonResponse(data)
+
+@csrf_exempt
+def confirm_sales_invoice(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        sales_id = data.get('id')
+        try:
+            sales = Sales.objects.get(id=sales_id)
+            if sales.invoice_status == "NA":
+                sales.invoice_status = "Sent"
+                sales.save()
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'error': 'Already confirmed.'}, status=400)
+        except Sales.DoesNotExist:
+            return JsonResponse({'error': 'Sales not found.'}, status=404)

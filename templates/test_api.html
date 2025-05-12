@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .response {
+            white-space: pre-wrap;
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button {
+            margin: 10px 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+        h2 {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Test Page</h1>
+    
+    <h2>1. Test Simple API Endpoint</h2>
+    <button onclick="testEndpoint('/api/test-endpoint/')">Test Basic API</button>
+    <div id="test-response" class="response"></div>
+    
+    <h2>2. Create Test Sale</h2>
+    <button onclick="testEndpoint('/api/create-test-sale/')">Create Test Sale</button>
+    <div id="create-sale-response" class="response"></div>
+    
+    <h2>3. Get Simple Latest Pending Sale</h2>
+    <button onclick="testEndpoint('/api/simple-latest-pending-sale/')">Get Simple Pending Sale</button>
+    <div id="simple-pending-response" class="response"></div>
+    
+    <h2>4. Get Full Latest Pending Sale</h2>
+    <button onclick="testEndpoint('/api/latest-pending-sale/')">Get Full Pending Sale</button>
+    <div id="full-pending-response" class="response"></div>
+    
+    <script>
+        function testEndpoint(url) {
+            const responseId = url.split('/')[2].replace(/-/g, '-') + '-response';
+            const responseElement = document.getElementById(responseId);
+            
+            if (responseElement) {
+                responseElement.textContent = 'Loading...';
+                
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        responseElement.textContent = JSON.stringify(data, null, 2);
+                    })
+                    .catch(error => {
+                        responseElement.textContent = `Error: ${error.message}`;
+                    });
+            }
+        }
+    </script>
+</body>
+</html> 
