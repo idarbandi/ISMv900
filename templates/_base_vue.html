@@ -1,10 +1,13 @@
 {% extends '_base.html' %}
 
 {% block html %}
-<html lang="" dir="rtl">
+<html lang="" dir="rtl"><head><script defer src="http://localhost:8080/js/chunk-vendors.js"></script><script defer src="http://localhost:8080/js/app.js"></script></head>
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="http://localhost:8080/favicon.ico">
       {% block head %}{{ block.super }}{% endblock %}
-  <script defer src="http://localhost:8080/js/chunk-vendors.js"></script><script defer src="http://localhost:8080/js/app.js"></script></head>
   <body class="bg-main-bg">
   {% block body %}
     {{ block.super }}
@@ -14,6 +17,7 @@
     <div id="app"></div>
     <!-- built files will be auto injected -->
   {% endblock body%}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   </body>
 </html>
 {% endblock html %}

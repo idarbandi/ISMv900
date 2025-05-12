@@ -1,5 +1,10 @@
 from django.urls import path
 from .views import *
+from django.conf.urls.static import static
+from django.conf import settings
+
+from invoice.views import *
+
 urlpatterns = [
     # Following paths are related to APIs:
 
@@ -47,6 +52,7 @@ urlpatterns = [
     path("api/reportProducts", report_Products),
     path("api/reportConsumption", report_Consumption),
     path("api/reportAlert", report_Alert),
+    path("api/generate-purchase-order-pdf/", generate_purchase_order_pdf),
     path("ProductsPage/", products_page),
 
     # Following paths are related to Pages:
@@ -70,5 +76,15 @@ urlpatterns = [
     path("forkliftPanel/", forklift_panel),
     path("cancel/", cancel),
     path("report/", report_page),
-]
+
+    
+    path("api/havaleh-pdf/", havaleh, name='havaleh-pdf'),
+    
+
+    path("invoice/", invoice_page),
+    path("invoice/havaleh", havaleh),
+    path("api/sales-order-pdf/", sales_order, name='sales-order-pdf'),
+    path("invoice/sales-order", sales_order),
+    path("invoice/Purchases/", Purchases),
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
