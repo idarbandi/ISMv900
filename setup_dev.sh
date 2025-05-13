@@ -135,7 +135,39 @@ echo "  Username: darbandi"
 echo "  Email: darbandi@gmail.com"
 echo "  Password: darbandidr99@gmail.com"
 
-# 6. Start the development server
+# Stop any running servers
+echo "Stopping any running servers..."
+pkill -f "python manage.py runserver" || true
+pkill -f "node" || true
+
 echo ""
+echo "===== Starting Servers ====="
+
+# Start the Django server in the background
 echo "Starting Django development server..."
-python manage.py runserver 
+python manage.py runserver 0.0.0.0:8000 &
+DJANGO_PID=$!
+
+# Wait for Django to start
+echo "Waiting for Django server to start..."
+sleep 5
+
+# Navigate to frontend directory and start Vue server
+if [ -d "frontend" ]; then
+    echo "Starting Vue frontend server..."
+    cd frontend && npm run serve &
+    VUE_PID=$!
+    cd ..
+else
+    echo "Frontend directory not found. Skipping Vue server startup."
+fi
+
+echo ""
+echo "===== Development Environment Ready ====="
+echo "Django server running at http://localhost:8000/"
+echo "Vue frontend running at http://localhost:8080/"
+echo ""
+echo "Press Ctrl+C to stop all servers"
+
+# Keep script running until user presses Ctrl+C
+wait 

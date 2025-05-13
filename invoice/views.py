@@ -1,9 +1,14 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from io import BytesIO
 
 from myapp.models import Sales, Customer
+# Removing model imports to avoid migration issues
+# from .models import Invoice, Havaleh, HavalehItem
 
 import json
 import traceback
@@ -265,6 +270,160 @@ def create_test_sale(request):
             'message': f'Test sale created with ID: {sale.id}',
             'sale_id': sale.id
         })
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def havaleh_pdf(request):
+    """Generate a PDF for the havaleh (delivery form)"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method is supported'}, status=405)
+    
+    try:
+        # Parse the JSON data from the request
+        data = json.loads(request.body)
+        
+        # Get all the form data
+        date = data.get('date', '')
+        serial = data.get('serial', '')
+        items = data.get('items', [])
+        note = data.get('note', '')
+        invoice_id = data.get('invoice_id')
+        
+        # Process date using PersianDateText if available
+        persian_date = date
+        try:
+            # Import here to avoid circular imports
+            from invoice.utils import PersianDateText
+            
+            # Parse date if it's in format like "1403/03/15"
+            if date and '/' in date:
+                date_parts = date.split('/')
+                if len(date_parts) == 3:
+                    persian_date_obj = PersianDateText(date_parts)
+                    persian_date = persian_date_obj.to_text()
+        except Exception as e:
+            print(f"Error processing Persian date: {e}")
+            # Continue with original date
+        
+        # Calculate total weight and convert weights to Persian text
+        total_weight = 0
+        processed_items = []
+        
+        for item in items:
+            weight = float(item.get('weight', 0))
+            total_weight += weight
+            
+            # Create a copy of the item with Persian weight
+            item_copy = item.copy()
+            
+            # Format weight with commas
+            weight_persian = f"{weight:,.0f}"
+            item_copy['weight_persian'] = weight_persian
+            
+            processed_items.append(item_copy)
+        
+        # Format total weight with Persian numerals
+        total_weight_persian = f"{total_weight:,.0f}"
+        
+        # Prepare context for template
+        context = {
+            'date': date,
+            'persian_date': persian_date,
+            'serial': serial,
+            'items': processed_items,
+            'note': note,
+            'total_weight': f"{total_weight:,.0f}",
+            'total_weight_persian': total_weight_persian
+        }
+        
+        # If invoice_id is provided, update the related Invoice record
+        if invoice_id:
+            try:
+                # Import Invoice model here to avoid circular imports
+                from invoice.models import Invoice
+                
+                # Find the invoice
+                invoice = Invoice.objects.get(id=invoice_id)
+                
+                # Mark as havaleh generated
+                invoice.havaleh_generated = True
+                invoice.havaleh_date = timezone.now()
+                invoice.havaleh_serial = serial
+                invoice.save()
+                
+                # Log in comments field of the sale
+                sale = invoice.sale
+                havaleh_info = f"Havaleh created on {timezone.now()} with serial: {serial}"
+                if sale.comments:
+                    sale.comments += f"\n{havaleh_info}"
+                else:
+                    sale.comments = havaleh_info
+                sale.save(update_fields=['comments'])
+                
+            except Exception as e:
+                print(f"Error updating Invoice record: {e}")
+                # Continue to generate PDF
+        
+        # Render the HTML template
+        html_string = render_to_string('havaleh.html', context)
+        
+        # Create PDF with WeasyPrint - using basic settings compatible with all versions
+        html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+        pdf_file = html.write_pdf(presentational_hints=True)
+        
+        # Create HTTP response with PDF
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="havaleh_{serial}.pdf"'
+        
+        return response
+        
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def havaleh_page(request):
+    """Render the havaleh page which will load the latest pending invoice"""
+    return render(request, 'havaleh_page.html')
+
+
+@csrf_exempt
+def latest_invoice(request):
+    """Get the latest invoice from the database, regardless of status"""
+    try:
+        from invoice.models import Invoice
+        
+        # Get the latest invoice by creation date
+        invoice = Invoice.objects.order_by('-created_at').first()
+        
+        if not invoice:
+            return JsonResponse({'message': 'No invoices found'}, status=404)
+        
+        # Get the associated sale
+        sale = invoice.sale
+        
+        # Prepare response data
+        data = {
+            'id': invoice.id,
+            'sale_id': sale.id,
+            'date': sale.date.isoformat() if sale.date else None,
+            'customer_name': str(sale.customer_name),
+            'invoice_number': getattr(sale, 'invoice_number', ''),
+            'year': invoice.year,
+            'month': invoice.month,
+            'day': invoice.day,
+            'is_paid': invoice.is_paid,
+            'created_at': invoice.created_at.isoformat(),
+            'list_of_reels': sale.list_of_reels,
+            'width': sale.width,
+            'net_weight': sale.net_weight
+        }
+        
+        return JsonResponse(data)
     
     except Exception as e:
         traceback.print_exc()

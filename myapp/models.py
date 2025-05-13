@@ -1,5 +1,6 @@
 from django.utils import timezone
 from django.db import models
+from django.core.exceptions import ValidationError
 
 class Truck(models.Model):
     """
@@ -390,6 +391,33 @@ class Sales(models.Model):
     class Meta:
         db_table = 'Sales'
         verbose_name_plural = "Sales"
+
+    def clean(self):
+        """
+        Validates that only one Sales record can have invoice_status='NA' at a time.
+        """
+        # Only check for 'NA' constraint if this record has 'NA' status
+        if self.invoice_status == 'NA':
+            # Check if there are other Sales records with 'NA' status
+            existing_na = Sales.objects.filter(invoice_status='NA')
+            
+            # If this is an existing record, exclude it from the check
+            if self.pk:
+                existing_na = existing_na.exclude(pk=self.pk)
+            
+            # If there's already another 'NA' record, raise error
+            if existing_na.exists():
+                raise ValidationError(
+                    "There can only be one pending invoice (with status 'NA') at a time. "
+                    "Please confirm or cancel the existing pending invoice before creating a new one."
+                )
+
+    def save(self, *args, **kwargs):
+        """
+        Override save method to run clean() before saving.
+        """
+        self.clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Sale (ID: {self.id}, Date: {self.date}, Customer: {self.customer_name})"

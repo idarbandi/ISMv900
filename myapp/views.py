@@ -3579,3 +3579,21 @@ def confirm_sales_invoice(request):
                 return JsonResponse({'error': 'Already confirmed.'}, status=400)
         except Sales.DoesNotExist:
             return JsonResponse({'error': 'Sales not found.'}, status=404)
+
+def check_pending_invoice(request):
+    """
+    API endpoint to check if there's a pending invoice with 'NA' status.
+    Returns JSON with:
+    - has_pending: boolean indicating if a pending invoice exists
+    - pending_id: ID of the pending invoice (if exists)
+    """
+    pending_invoice = Sales.objects.filter(invoice_status='NA').first()
+    
+    response_data = {
+        'has_pending': pending_invoice is not None
+    }
+    
+    if pending_invoice:
+        response_data['pending_id'] = pending_invoice.id
+    
+    return JsonResponse(response_data)

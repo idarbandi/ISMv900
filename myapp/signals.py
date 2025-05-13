@@ -10,7 +10,7 @@ def create_invoice_on_status_change(sender, instance, **kwargs):
     Signal handler to create an Invoice instance when a Sale's invoice_status
     changes from 'NA' to 'Sent'.
     """
-    print(f"Signal triggered for sale {instance.id}: {instance.invoice_status}")
+    print(f"Signal triggered for sale {instance.id if instance.id else 'new'}: {instance.invoice_status}")
     
     try:
         # Check if this is a new object (no ID yet)
@@ -52,4 +52,4 @@ def create_invoice_on_status_change(sender, instance, **kwargs):
     except Exception as e:
         import traceback
         print(f"Error in create_invoice_on_status_change signal: {e}")
-        traceback.print_exc()
+        traceback.print_exc() 

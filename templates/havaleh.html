@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
+
 <head>
     <meta charset="UTF-8">
     <title>حواله خروج از انبار</title>
@@ -10,6 +11,11 @@
             src: url('{% static "fonts/BDavat.ttf" %}') format('truetype');
             font-weight: normal;
             font-style: normal;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
         }
 
         body {
@@ -22,14 +28,15 @@
 
         /* Center the whole havaleh block and set a fixed width */
         .havaleh-copy {
-            width: 650px; /* Adjust this width as needed for your print/PDF size */
-            margin: 24px auto;
+            width: 90%;
+            max-width: 680px;
+            margin: 8px auto;
             border: 1px solid #222;
             background: #fff;
-            padding: 18px 16px 80px 16px;
+            padding: 8px 10px 50px 10px;
             box-sizing: border-box;
             position: relative;
-            min-height: 240px;
+            min-height: 180px;
             page-break-inside: avoid;
         }
 
@@ -37,42 +44,49 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 14px;
+            margin-bottom: 3px;
         }
+
         .logo-section {
-            width: 70px;
+            width: 55px;
             text-align: right;
         }
+
         .logo-section img {
-            width: 55px;
-            height: 55px;
+            width: 40px;
+            height: 40px;
             object-fit: contain;
             display: block;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
+
         .logo-section div {
-            font-size: 9pt;
+            font-size: 7pt;
             text-align: center;
         }
+
         .company-info {
             flex: 1;
             text-align: center;
             margin: 0 5px;
         }
+
         .company-name {
-            font-size: 13pt;
-            font-weight: bold;
-            margin-bottom: 2px;
-        }
-        .document-title {
             font-size: 11pt;
+            font-weight: bold;
+            margin-bottom: 1px;
+        }
+
+        .document-title {
+            font-size: 9pt;
             margin-bottom: 0;
         }
+
         .document-info {
-            width: 120px;
+            width: 100px;
             text-align: left;
-            font-size: 9pt;
-            line-height: 1.7;
+            font-size: 7pt;
+            line-height: 1.3;
         }
 
         /* Center the table and set width just like the sample */
@@ -80,78 +94,113 @@
             width: 100%;
             display: flex;
             justify-content: center;
+            margin: 4px 0;
+            padding-right: 8px;
+            box-sizing: border-box;
         }
+
         table {
-            width: 97%;
+            width: 96%;
             margin: 0 auto;
             border-collapse: collapse;
-            font-size: 10pt;
+            font-size: 8pt;
             table-layout: fixed;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #222;
-            padding: 7px 6px 6px 6px;
+            padding: 2px 2px;
             text-align: center;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             font-family: 'BDavat', Arial, sans-serif;
+            height: 16px;
         }
+
         th {
             background-color: #f7f7f7;
             font-weight: bold;
+            height: 18px;
         }
-        .col-1 { width: 7%; }
-        .col-2 { width: 24%; }
-        .col-3 { width: 10%; }
-        .col-4 { width: 13%; }
-        .col-5 { width: 20%; }
-        .col-6 { width: 13%; }
-        .col-7 { width: 13%; }
+
+        .col-1 {
+            width: 7%;
+        }
+
+        .col-2 {
+            width: 24%;
+        }
+
+        .col-3 {
+            width: 10%;
+        }
+
+        .col-4 {
+            width: 13%;
+        }
+
+        .col-5 {
+            width: 20%;
+        }
+
+        .col-6 {
+            width: 13%;
+        }
+
+        .col-7 {
+            width: 13%;
+        }
 
         .total-row td {
             font-weight: bold;
             background-color: transparent;
-            border-top: 2px solid #222;
+            border-top: 1px solid #222;
+            height: 18px;
         }
 
         .notes {
             text-align: right;
-            margin: 9px 0 0 0;
-            font-size: 9pt;
-            line-height: 1.7;
+            margin: 3px 10px 0 0;
+            font-size: 7pt;
+            line-height: 1.3;
         }
+
         .footer {
             display: flex;
             justify-content: space-between;
-            gap: 6px;
+            gap: 4px;
             position: absolute;
-            bottom: 35px;
-            left: 16px;
-            right: 16px;
+            bottom: 20px;
+            left: 10px;
+            right: 10px;
         }
+
         .signature-line {
             flex: 1;
             text-align: center;
             border-top: 1px solid #222;
             padding-top: 2px;
-            font-size: 9pt;
+            font-size: 7pt;
         }
+
         .confirmation-text {
             text-align: right;
-            font-size: 9pt;
+            font-size: 7pt;
             position: absolute;
-            bottom: 10px;
-            right: 16px;
+            bottom: 5px;
+            right: 10px;
         }
     </style>
 </head>
+
 <body>
     {% for i in '123'|make_list %}
     <div class="havaleh-copy">
         <div class="header">
             <div class="logo-section">
-                <img src="{% static 'images/homayoun-logo.png' %}" alt="Homayoun Logo">
+                <img src="{% static 'backend/static/images/Homayoun_logo.png' %}" alt="Homayoun Logo">
                 <div>همایون</div>
                 <div>HOMAYOUN</div>
             </div>
@@ -160,7 +209,7 @@
                 <div class="document-title">حواله خروج از انبار</div>
             </div>
             <div class="document-info">
-                <div>تاریخ ارسال: {{ date }}</div>
+                <div>تاریخ ارسال: {{ persian_date }}</div>
                 <div>شماره سریال: {{ serial }}</div>
             </div>
         </div>
@@ -186,12 +235,12 @@
                         <td>{{ item.width }}</td>
                         <td>{{ item.buyer }}</td>
                         <td>{{ item.quantity }}</td>
-                        <td>{{ item.weight }}</td>
+                        <td>{{ item.weight_persian }}</td>
                     </tr>
                     {% endfor %}
                     <tr class="total-row">
                         <td colspan="6" style="text-align: center;">جمع</td>
-                        <td>{{ total_weight }}</td>
+                        <td>{{ total_weight_persian }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -212,4 +261,5 @@
     </div>
     {% endfor %}
 </body>
+
 </html>

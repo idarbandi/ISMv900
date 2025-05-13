@@ -1,187 +1,385 @@
 {% load static %}
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
+
 <head>
     <meta charset="UTF-8">
-    <title>پیش فاکتور فروش</title>
+    <title>صورت حساب فروش کالا</title>
     <style>
+        @font-face {
+            font-family: 'BDavat';
+            src: url('{% static "fonts/BDavat.ttf" %}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'BDavat', Arial, sans-serif;
             direction: rtl;
             background: white;
             margin: 0;
             padding: 0;
+            font-size: 12pt;
         }
-        .order-copy {
-            width: 650px;
-            margin: 24px auto;
-            border: 1px solid #222;
-            background: #fff;
-            padding: 18px 16px 80px 16px;
+
+        .invoice {
+            width: 210mm;
+            margin: 5mm auto;
+            border: 1.5px solid #000;
+            padding: 8mm 5mm;
             box-sizing: border-box;
-            min-height: 240px;
             page-break-inside: avoid;
+            background-color: white;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 8mm;
+            padding-bottom: 2mm;
             position: relative;
         }
-        .header {
+
+        .title:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 20%;
+            left: 20%;
+            height: 1px;
+            background-color: #888;
+        }
+
+        .header-section {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 14px;
+            border: 1.5px solid #000;
+            margin-bottom: 5mm;
         }
-        .logo-section {
-            width: 70px;
-            text-align: right;
-        }
-        .logo-section img {
-            width: 55px;
-            height: 55px;
-            object-fit: contain;
-            display: block;
-            margin-bottom: 2px;
-        }
-        .company-info {
-            flex: 1;
-            text-align: center;
-            margin: 0 5px;
-        }
-        .company-name {
-            font-size: 13pt;
+
+        .header-title {
+            background-color: #d0d0d0;
+            padding: 3mm 5mm;
             font-weight: bold;
-            margin-bottom: 2px;
+            text-align: center;
+            border-bottom: 1.5px solid #000;
+            font-size: 14pt;
         }
-        .document-title {
-            font-size: 11pt;
-            margin-bottom: 0;
-        }
-        .document-info {
-            width: 120px;
-            text-align: left;
-            font-size: 9pt;
-            line-height: 1.7;
-        }
-        .customer-info {
-            font-size: 10pt;
-            margin-bottom: 10px;
-            text-align: right;
-        }
-        .table-container {
+
+        .seller-info,
+        .buyer-info {
             width: 100%;
+        }
+
+        .info-row {
             display: flex;
-            justify-content: center;
         }
-        table {
-            width: 97%;
-            margin: 0 auto;
+
+        .info-col {
+            padding: 2mm 3mm;
+            border-left: 1px solid #000;
+            flex: 1;
+        }
+
+        .info-col:last-child {
+            border-left: none;
+        }
+
+        .info-label {
+            font-weight: normal;
+            display: inline-block;
+            width: 85px;
+            text-align: left;
+            color: #333;
+        }
+
+        .info-value {
+            font-weight: bold;
+        }
+
+        .items-table {
+            width: 100%;
             border-collapse: collapse;
-            font-size: 10pt;
-            table-layout: fixed;
-        }
-        th, td {
-            border: 1px solid #222;
-            padding: 7px 6px 6px 6px;
+            margin-bottom: 5mm;
             text-align: center;
-            font-family: Arial, sans-serif;
         }
-        th {
-            background-color: #f7f7f7;
+
+        .items-table th {
+            background-color: #d0d0d0;
             font-weight: bold;
+            border: 1.5px solid #000;
+            padding: 2.5mm 2mm;
+            font-size: 11pt;
+            vertical-align: middle;
         }
-        .col-1 { width: 7%; }
-        .col-2 { width: 36%; }
-        .col-3 { width: 12%; }
-        .col-4 { width: 16%; }
-        .col-5 { width: 18%; }
-        .total-row td {
+
+        .items-table td {
+            border: 1.5px solid #000;
+            padding: 3mm 2mm;
+            font-size: 12pt;
+            vertical-align: middle;
+        }
+
+        .col-number {
+            width: 5%;
+        }
+
+        .col-code {
+            width: 6%;
+        }
+
+        .col-desc {
+            width: 25%;
+        }
+
+        .col-qty {
+            width: 7%;
+        }
+
+        .col-unit {
+            width: 6%;
+        }
+
+        .col-price {
+            width: 10%;
+        }
+
+        .col-total {
+            width: 12%;
+        }
+
+        .col-discount {
+            width: 7%;
+        }
+
+        .col-tax {
+            width: 10%;
+        }
+
+        .col-final {
+            width: 12%;
+        }
+
+        .totals-row td {
+            border-top: 2.5px solid #000 !important;
             font-weight: bold;
-            background-color: transparent;
-            border-top: 2px solid #222;
+            padding: 3mm 2mm;
         }
-        .notes {
-            text-align: right;
-            margin: 9px 0 0 0;
-            font-size: 9pt;
-            line-height: 1.7;
+
+        .amount-in-words {
+            border-top: 1.5px solid #000;
+            padding: 3mm 2mm;
+            font-weight: bold;
+            margin-bottom: 15mm;
+            font-size: 13pt;
         }
+
         .footer {
             display: flex;
             justify-content: space-between;
-            gap: 6px;
-            position: absolute;
-            bottom: 35px;
-            left: 16px;
-            right: 16px;
+            margin-top: 15mm;
         }
-        .signature-line {
-            flex: 1;
+
+        .signature {
             text-align: center;
-            border-top: 1px solid #222;
-            padding-top: 2px;
-            font-size: 9pt;
+            flex: 1;
+            padding: 0 10mm;
+        }
+
+        .signature-title {
+            margin-bottom: 25mm;
+            font-weight: bold;
+            font-size: 14pt;
+        }
+
+        .number-cell {
+            direction: ltr;
+            text-align: center;
+        }
+
+        /* Ensure numbers show as Persian/Arabic numerals */
+        .persian-number {
+            direction: rtl;
+            unicode-bidi: embed;
         }
     </style>
 </head>
+
 <body>
-    {% for i in '123'|make_list %}
-    <div class="order-copy">
-        <div class="header">
-            <div class="logo-section">
-                <img src="{% static 'images/homayoun-logo.png' %}" alt="Homayoun Logo">
-                <div>همایون</div>
-                <div>HOMAYOUN</div>
+    <div class="invoice">
+        <div class="title">صورت حساب فروش کالا</div>
+
+        <!-- Seller Information -->
+        <div class="header-section">
+            <div class="seller-info">
+                <div class="header-title">مشخصات فروشنده</div>
+                <div class="info-row">
+                    <div class="info-col">
+                        <span class="info-label">نام شخص حقیقی/حقوقی:</span>
+                        <span class="info-value">شرکت صنایع تولیدی کاغذ و مقوای همایون</span>
+                    </div>
+                    <div class="info-col">
+                        <span class="info-label">کد اقتصادی:</span>
+                        <span class="info-value persian-number">{{ seller_economic_code|default:"14012603703" }}</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-col">
+                        <span class="info-label">شناسه ملی:</span>
+                        <span class="info-value persian-number">{{ seller_reg_number|default:"14012603703" }}</span>
+                    </div>
+                    <div class="info-col">
+                        <span class="info-label">کد پستی:</span>
+                        <span class="info-value persian-number">{{ seller_postal_code|default:"3364146586" }}</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-col" style="border-bottom: none;">
+                        <span class="info-label">شماره:</span>
+                        <span class="info-value persian-number">{{ invoice_number|default:"14040056" }}</span>
+                    </div>
+                    <div class="info-col" style="border-bottom: none;">
+                        <span class="info-label">تلفن/نمابر:</span>
+                        <span class="info-value persian-number">{{ seller_phone|default:"026-44383368" }}</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-col" style="border-top: none; border-bottom: none;" colspan="2">
+                        <span class="info-label">نشانی:</span>
+                        <span class="info-value">{{ seller_address|default:"کیلو متر 15 جاده قدیم کرج - قزوین خیابان
+                            مرغک خیابان صنعت دومین کارخانه سمت چپ" }}</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-col" style="border-top: none;">
+                        <span class="info-label">تاریخ:</span>
+                        <span class="info-value persian-number">{{ date|default:"1404/02/15" }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="company-info">
-                <div class="company-name">شرکت صنایع تولیدی کاغذ و مقوای همایون</div>
-                <div class="document-title">پیش فاکتور فروش</div>
+        </div>
+
+        <!-- Buyer Information -->
+        <div class="header-section">
+            <div class="buyer-info">
+                <div class="header-title">مشخصات خریدار</div>
+                <div class="info-row">
+                    <div class="info-col">
+                        <span class="info-label">نام شخص حقیقی/حقوقی:</span>
+                        <span class="info-value">{{ customer_name|default:"شرکت صنایع بسته بندی سهیل البرز ایرانیان"
+                            }}</span>
+                    </div>
+                    <div class="info-col">
+                        <span class="info-label">کد اقتصادی:</span>
+                        <span class="info-value persian-number">{{ customer_economic_code|default:"14007172415"
+                            }}</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-col">
+                        <span class="info-label">شناسه ملی:</span>
+                        <span class="info-value persian-number">{{ customer_national_id|default:"14007172415" }}</span>
+                    </div>
+                    <div class="info-col">
+                        <span class="info-label">کد پستی:</span>
+                        <span class="info-value persian-number">{{ customer_postal_code|default:"3451168795" }}</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-col" style="border-bottom: none;">
+                        <span class="info-label">شناسه ثبت:</span>
+                        <span class="info-value persian-number">{{ customer_reg_number|default:"14007172415" }}</span>
+                    </div>
+                    <div class="info-col" style="border-bottom: none;">
+                        <span class="info-label">تلفن/نمابر:</span>
+                        <span class="info-value persian-number">{{ customer_phone|default:"" }}</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-col" style="border-top: none;" colspan="2">
+                        <span class="info-label">نشانی:</span>
+                        <span class="info-value">{{ customer_address|default:"قزوین بوئین زهرا-خیابان امام آب گرم کوچه
+                            سروناز" }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="document-info">
-                <div>تاریخ: {{ date }}</div>
-                <div>شماره سریال: {{ serial }}</div>
-            </div>
         </div>
-        <div class="customer-info">
-            مشتری: {{ customer|default:"-" }}<br>
-            کد اقتصادی: {{ economic_code|default:"-" }}<br>
-            شناسه ملی: {{ national_id|default:"-" }}
+
+        <!-- Items Table -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th class="col-number">ردیف</th>
+                    <th class="col-code">کد کالا</th>
+                    <th class="col-desc">شرح کالا یا خدمت</th>
+                    <th class="col-qty">مقدار</th>
+                    <th class="col-unit">واحد</th>
+                    <th class="col-price">قیمت واحد</th>
+                    <th class="col-total">مبلغ کل</th>
+                    <th class="col-discount">مبلغ تخفیف</th>
+                    <th class="col-tax">جمع مالیات و عوارض 10%</th>
+                    <th class="col-final">جمع مبلغ کل و مالیات و عوارض</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="persian-number">{{ item.code|default:"1005" }}</td>
+                    <td>{{ item.description|default:"کاغذ کرافت لاینر کرایه 130 عرض 250" }}</td>
+                    <td class="persian-number">{{ item.quantity|default:"23340" }}</td>
+                    <td>{{ item.unit|default:"کیلو" }}</td>
+                    <td class="persian-number">{{ item.price|default:"370,000" }}</td>
+                    <td class="persian-number">{{ item.total|default:"8,635,800,000" }}</td>
+                    <td class="persian-number">{{ item.discount|default:"0" }}</td>
+                    <td class="persian-number">{{ item.tax|default:"863,580,000" }}</td>
+                    <td class="persian-number">{{ item.final_total|default:"9,499,380,000" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td>۱</td>
+                    <td>۱۰۰۵</td>
+                    <td>کاغذ کرافت لاینر کرایه 130 عرض 250</td>
+                    <td>۲۳۳۴۰</td>
+                    <td>کیلو</td>
+                    <td>۳۷۰,۰۰۰</td>
+                    <td>۸,۶۳۵,۸۰۰,۰۰۰</td>
+                    <td>۰</td>
+                    <td>۸۶۳,۵۸۰,۰۰۰</td>
+                    <td>۹,۴۹۹,۳۸۰,۰۰۰</td>
+                </tr>
+                {% endfor %}
+                <tr class="totals-row">
+                    <td colspan="6">جمع کل</td>
+                    <td class="persian-number">{{ total_amount|default:"8,635,800,000" }}</td>
+                    <td class="persian-number">{{ total_discount|default:"0" }}</td>
+                    <td class="persian-number">{{ total_tax|default:"863,580,000" }}</td>
+                    <td class="persian-number">{{ grand_total|default:"9,499,380,000" }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="amount-in-words">
+            <span>به حروف:</span>
+            <span>{{ amount_in_words|default:"نه میلیارد و چهارصد و نود و نه میلیون و سیصد و هشتاد هزار" }} ریال</span>
         </div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="col-1">ردیف</th>
-                        <th class="col-2">شرح کالا</th>
-                        <th class="col-3">تعداد</th>
-                        <th class="col-4">قیمت واحد</th>
-                        <th class="col-5">جمع</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ item.description }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>{{ item.price }}</td>
-                        <td>{{ item.total }}</td>
-                    </tr>
-                    {% endfor %}
-                    <tr class="total-row">
-                        <td colspan="4" style="text-align: center;">جمع کل</td>
-                        <td>{{ total_amount }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="notes">
-            <div>ملاحظات: {{ note|default:"-" }}</div>
-        </div>
+
         <div class="footer">
-            <div class="signature-line">حسابداری</div>
-            <div class="signature-line">مدیر فروش</div>
-            <div class="signature-line">مدیریت کارخانه</div>
-            <div class="signature-line">تحویل گیرنده</div>
+            <div class="signature">
+                <div class="signature-title">مهر و امضاء فروشنده</div>
+            </div>
+            <div class="signature">
+                <div class="signature-title">مهر و امضاء خریدار</div>
+            </div>
         </div>
     </div>
-    {% endfor %}
 </body>
+
 </html>

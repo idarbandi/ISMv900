@@ -2,6 +2,7 @@ from django.urls import path
 from .views import *
 from django.conf.urls.static import static
 from django.conf import settings
+from django.http import JsonResponse
 
 from invoice.views import *
 
@@ -56,8 +57,12 @@ urlpatterns = [
     path("api/simple-latest-pending-sale/", simple_latest_pending_sale),
     path("api/confirm-sales-invoice/<int:sales_id>/", confirm_sales_invoice),
     path("api/confirm-sales-invoice/", confirm_sales_invoice),
+    path("api/check-pending-invoice/", check_pending_invoice),
     path("api/test-endpoint/", test_api),
     path("api/create-test-sale/", create_test_sale),
+    path("api/havaleh-pdf/", havaleh_pdf),
+    path("api/havaleh-test/", lambda request: JsonResponse({"status": "success", "message": "Havaleh API endpoint is working"})),
+    path("api/latest-invoice/", latest_invoice),
     path("ProductsPage/", products_page),
 
     # Following paths are related to Pages:
@@ -85,5 +90,6 @@ urlpatterns = [
     path("invoice/", invoice_page),
     path("api/sales-order-pdf/", sales_order, name='sales-order-pdf'),
     path("invoice/sales-order", sales_order),
+    path("invoice/havaleh", havaleh_page),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

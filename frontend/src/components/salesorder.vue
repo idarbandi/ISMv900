@@ -6,84 +6,84 @@
     
     <div v-else-if="error" class="error">
       {{ error }}
-    </div>
+      </div>
     
     <div v-if="!loading && !confirmed && error" class="refresh-container">
       <button @click="fetchLatestSale" class="refresh-btn">
         بارگذاری مجدد
       </button>
-    </div>
+      </div>
     
     <div v-else-if="!saleData" class="no-data">
       فاکتور جدیدی برای تأیید وجود ندارد.
-    </div>
+      </div>
     
     <div v-else>
       <!-- Invoice Preview -->
       <div ref="pdfPreview" class="pdf-preview">
-        <div class="invoice-main">
-          <div class="invoice-title">صورت حساب فروش کالا</div>
-          <table class="invoice-details-table">
-            <tr>
-              <td class="detail-title">مشخصات فروشنده</td>
-              <td>نام فروشنده: {{ form.seller_name }}</td>
-              <td>شماره اقتصادی: {{ form.seller_economic_code }}</td>
-              <td>شماره ثبت: {{ form.seller_reg }}</td>
-              <td>کد پستی: {{ form.seller_postcode }}</td>
-              <td>تلفن: {{ form.seller_phone }}</td>
-            </tr>
-            <tr>
-              <td class="detail-title">مشخصات خریدار</td>
-              <td>نام خریدار: {{ form.buyer_name }}</td>
-              <td>شماره اقتصادی: {{ form.buyer_economic_code }}</td>
-              <td>شماره ثبت: {{ form.buyer_reg }}</td>
-              <td>کد پستی: {{ form.buyer_postcode }}</td>
-              <td>تلفن: {{ form.buyer_phone }}</td>
-            </tr>
-            <tr>
-              <td class="detail-title">شماره فاکتور</td>
+      <div class="invoice-main">
+        <div class="invoice-title">صورت حساب فروش کالا</div>
+        <table class="invoice-details-table">
+          <tr>
+            <td class="detail-title">مشخصات فروشنده</td>
+            <td>نام فروشنده: {{ form.seller_name }}</td>
+            <td>شماره اقتصادی: {{ form.seller_economic_code }}</td>
+            <td>شماره ثبت: {{ form.seller_reg }}</td>
+            <td>کد پستی: {{ form.seller_postcode }}</td>
+            <td>تلفن: {{ form.seller_phone }}</td>
+          </tr>
+          <tr>
+            <td class="detail-title">مشخصات خریدار</td>
+            <td>نام خریدار: {{ form.buyer_name }}</td>
+            <td>شماره اقتصادی: {{ form.buyer_economic_code }}</td>
+            <td>شماره ثبت: {{ form.buyer_reg }}</td>
+            <td>کد پستی: {{ form.buyer_postcode }}</td>
+            <td>تلفن: {{ form.buyer_phone }}</td>
+          </tr>
+          <tr>
+            <td class="detail-title">شماره فاکتور</td>
               <td colspan="2">{{ form.serial || saleData.id }}</td>
-              <td class="detail-title">تاریخ</td>
-              <td colspan="2">{{ form.date }}</td>
+            <td class="detail-title">تاریخ</td>
+            <td colspan="2">{{ form.date }}</td>
+          </tr>
+        </table>
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>شرح کالا</th>
+              <th>کد کالا</th>
+              <th>تعداد</th>
+              <th>واحد</th>
+              <th>مبلغ واحد</th>
+              <th>مبلغ کل</th>
+              <th>ملاحظات</th>
             </tr>
-          </table>
-          <table class="invoice-table">
-            <thead>
-              <tr>
-                <th>شرح کالا</th>
-                <th>کد کالا</th>
-                <th>تعداد</th>
-                <th>واحد</th>
-                <th>مبلغ واحد</th>
-                <th>مبلغ کل</th>
-                <th>ملاحظات</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in form.items" :key="item.code + item.description">
-                <td>{{ item.description }}</td>
-                <td>{{ item.code }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.unit }}</td>
-                <td>{{ formatNumber(item.price) }}</td>
-                <td>{{ formatNumber(item.total) }}</td>
-                <td>{{ item.comment }}</td>
-              </tr>
-              <tr>
-                <td colspan="5" class="total-label">جمع کل</td>
-                <td colspan="2" class="total-value">{{ formatNumber(totalAmount) }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="footer-row">
+          </thead>
+          <tbody>
+            <tr v-for="item in form.items" :key="item.code + item.description">
+              <td>{{ item.description }}</td>
+              <td>{{ item.code }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.unit }}</td>
+              <td>{{ formatNumber(item.price) }}</td>
+              <td>{{ formatNumber(item.total) }}</td>
+              <td>{{ item.comment }}</td>
+            </tr>
+            <tr>
+              <td colspan="5" class="total-label">جمع کل</td>
+              <td colspan="2" class="total-value">{{ formatNumber(totalAmount) }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="footer-row">
             <div>مبلغ قابل پرداخت به حروف و عدد: {{ formatNumber(totalAmount) }}</div>
-            <div>
-              <span>امضا خریدار:</span> ....................................
-              <span style="margin-right:40px;">امضا فروشنده:</span> ....................................
-            </div>
+          <div>
+            <span>امضا خریدار:</span> ....................................
+            <span style="margin-right:40px;">امضا فروشنده:</span> ....................................
           </div>
         </div>
       </div>
+    </div>
       
       <div class="button-container">
         <!-- Only show confirm button if invoice_status is 'NA' -->
@@ -308,12 +308,12 @@ export default {
     
     async downloadPDF() {
       try {
-        await this.$nextTick();
+      await this.$nextTick();
         const options = {
-          margin: 0.2,
-          filename: `sales_order_${this.form.serial}.pdf`,
-          html2canvas: { scale: 2 },
-          jsPDF: { orientation: "landscape", unit: "mm", format: "a4" }
+        margin: 0.2,
+        filename: `sales_order_${this.form.serial}.pdf`,
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: "landscape", unit: "mm", format: "a4" }
         };
         
         await html2pdf().from(this.$refs.pdfPreview).set(options).save();
