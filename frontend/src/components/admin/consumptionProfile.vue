@@ -50,11 +50,21 @@ export default {
         'supplier_name': this.forms.supplier_name.value,
         'material_name': this.forms.material_name.value,
         'unit': this.forms.unit.value,
-        'quantity': this.forms.quantity.value,
+        'quantity': this.formatNumber(this.forms.quantity.value),
       }
       if (this.forms.consumption_list.value.length <=9){
        this.forms.consumption_list.value.push(profile)
+       // Clear form fields after adding
+       this.forms.quantity.value = '';
       }
+    },
+    formatNumber(value) {
+      // Remove existing commas, then add them back
+      const valueWithoutCommas = String(value).replace(/,/g, '');
+      if (!isNaN(valueWithoutCommas)) {
+        return valueWithoutCommas.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+      return value;
     },
     remove(index){
       this.forms.consumption_list.value.splice(index, 1)
@@ -108,18 +118,23 @@ export default {
       }
       if (this.errors.length == 0){
         this.error = false
-        const response = await this.axios.post('/myapp/addConsumptionProfile/', {}, {params: params})
-        console.log(response.data); // Access response data
-        if (response.data['status'] == 'success'){
-          this.success = true
-        }else {
-          this.error = true
-          this.errors = response.data['errors']
+        try {
+          const response = await this.axios.post('/myapp/addConsumptionProfile/', {}, {params: params})
+          console.log(response.data); // Access response data
+          if (response.data['status'] == 'success'){
+            this.success = true
+          }else {
+            this.error = true
+            this.errors = response.data['errors']
+          }
+        } catch (error) {
+          console.error("Error occurred:", error);
+          this.error = true;
+          this.errors = [{'message': `خطا در برقراری ارتباط با سرور: ${error.message}`}];
         }
       } else {
         this.error = true
       }
-
     },
   }
 }

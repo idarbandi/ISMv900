@@ -67,7 +67,7 @@ class PurchasesAdmin(admin.ModelAdmin):
 
     list_display = ('date', 'receive_date', 'material_type', 'material_name','supplier_name', 'unit', 'quantity', 'quality', 'penalty', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat', 'total_price', 'extra_cost', 'invoice_status', 'status', 'payment_details', 'payment_date', 'invoice_number', 'document_info', 'comments', 'cancellation_reason', 'shipment_id', 'username', 'logs',)
 
-    search_fields = ('material_name', 'supplier_id')
+    search_fields = ('material_name', 'supplier_name')
 
     list_filter = ('date', 'receive_date', 'material_type', 'material_name','supplier_name', 'unit', 'quantity', 'quality', 'penalty', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat', 'total_price', 'extra_cost', 'invoice_status', 'status', 'payment_details', 'payment_date', 'invoice_number', 'document_info', 'comments', 'cancellation_reason', 'shipment_id', 'username', 'logs',)
 
@@ -188,7 +188,7 @@ class ConsumptionAdmin(admin.ModelAdmin):
     # Specify the fields to use in the filter sidebar
     list_filter = ('status', 'supplier_name', 'material_type')
     # Specify the fields to display in the detail view
-    fields = ('receive_date', 'supplier_id', 'supplier_name', 'material_type', 'material_name', 'unit', 'reel_number', 'profile_name', 'comments', 'status', 'username', 'logs')
+    fields = ('receive_date', 'supplier_name', 'material_type', 'material_name', 'unit', 'reel_number', 'profile_name', 'comments', 'status', 'username', 'logs')
 
 
 @admin.register(ConsumptionProfile)

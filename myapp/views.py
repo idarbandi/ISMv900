@@ -2683,35 +2683,45 @@ def add_consumption_profile(request):
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
 
-        for profile in consumption_list:
-            supplier_name = profile['supplier_name']
-            material_name = profile['material_name']
-            raw = RawMaterial.objects.filter(supplier_name=supplier_name, material_name=material_name, status='Active')
-            material_type = raw[0].material_type
-            unit = profile['unit']
-            quantity = profile['quantity']
-            # Create a new ConsumptionProfile instance
-            new_consumption = ConsumptionProfile(
-                profile_name=profile_name,
-                supplier_name=supplier_name,
-                material_name=material_name,
-                material_type=material_type,
-                unit=unit,
-                quantity=int(quantity),
-                receive_date=get_time(),
-                status="Active",
-                username=username,
-                logs=log_generator(username, 'Created')
-            )
-            new_consumption.save()
-        # Save the new Customer object to the database
         try:
-            # new_consumption.save()
+            for profile in consumption_list:
+                supplier_name = profile['supplier_name']
+                material_name = profile['material_name']
+                raw = RawMaterial.objects.filter(supplier_name=supplier_name, material_name=material_name, status='Active')
+                
+                # Check if raw material exists
+                if not raw.exists():
+                    errors.append({'status': 'error', 'message': f'مواد خام با نام "{material_name}" از تأمین کننده "{supplier_name}" با وضعیت فعال یافت نشد.'})
+                    continue
+                
+                material_type = raw[0].material_type
+                unit = profile['unit']
+                quantity = profile['quantity'].replace(',', '') if isinstance(profile['quantity'], str) else profile['quantity']
+                
+                # Create a new ConsumptionProfile instance
+                new_consumption = ConsumptionProfile(
+                    profile_name=profile_name,
+                    supplier_name=supplier_name,
+                    material_name=material_name,
+                    material_type=material_type,
+                    unit=unit,
+                    quantity=int(quantity),
+                    receive_date=get_time(),
+                    status="Active",
+                    username=username,
+                    logs=log_generator(username, 'Created')
+                )
+                new_consumption.save()
+            
+            # If there were errors during processing, return them
+            if errors:
+                return JsonResponse({'status': 'error', 'errors': errors})
+            
             # Return success response
             return JsonResponse({'status': 'success', 'message': 'Consumption profile has been added.'})
         except Exception as e:
-                # Handle any exceptions that occur during the save operation
-                return JsonResponse({'status': 'error', 'message': f'Error adding consumption: {str(e)}'})
+            # Handle any exceptions that occur during the save operation
+            return JsonResponse({'status': 'error', 'errors': [{'message': f'Error adding consumption: {str(e)}'}]})
     else:
         # Handle non-POST requests
         return render(request, 'add_consumption_profile.html')
