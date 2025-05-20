@@ -1,51 +1,41 @@
 {
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file",
+    "editor.defaultFormatter": "ms-python.autopep8",
     "editor.autoIndent": "full",
     "editor.fontFamily": "JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
     "editor.fontLigatures": true,
-    
-    // Python formatting
-    "python.formatting.provider": "none",
-    
-    // Linting
+    "python.formatting.provider": "black",
+    "python.formatting.blackargs": [
+        "--line-length", 
+        "3192"
+    ],
+    "python.sortImports.args": [
+        "--profile=black",
+    ],
+    "python.formating.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length=119"
+    ],
+    "python.analysis.extraPaths": [
+    "~/.local/lib/Google/google_appengine",
+    "~/.local/lib/Google/google_appengine/lib/flask-0.12" ],
     "python.linting.enabled": true,
     "python.linting.lintOnSave": true,
-    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Enabled": false,
     "python.linting.flake8Args": [
-        "--max-line-length=88",
-        "--extend-ignore=E203"
+        "--max-line-length",
+        "1190"
     ],
-    
-    // Additional python paths
-    "python.analysis.extraPaths": [
-        "~/.local/lib/Google/google_appengine",
-        "~/.local/lib/Google/google_appengine/lib/flask-0.12"
-    ],
-    
-    // Language-specific settings
     "[python]": {
-        "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
             "source.organizeImports": "explicit"
         },
-        "editor.defaultFormatter": "ms-python.black-formatter"
+        "editor.defaultFormatter": "ms-python.autopep8"
     },
     "[typescriptreact]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    
-    // Black formatter settings
-    "black-formatter.args": [
-        "--line-length=88"
-    ],
-    
-    // isort settings
-    "isort.args": [
-        "--profile=black",
-        "--line-length=88"
-    ],
-    
-    // Disabling Docker auto-config
-    "DockerRun.DisableAutoGenerateConfig": true
+    "DockerRun.DisableAutoGenerateConfig": true,
+
 }

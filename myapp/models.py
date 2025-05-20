@@ -1,6 +1,5 @@
 from django.utils import timezone
 from django.db import models
-from django.core.exceptions import ValidationError
 
 class Truck(models.Model):
     """
@@ -192,16 +191,17 @@ class Products(models.Model):
 
 
 class Customer(models.Model):
-    
     date = models.DateTimeField(default=timezone.now, blank=True)
     status = models.CharField(max_length=255, blank=True, default='Active')
     customer_name = models.CharField(max_length=255, null=False)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
     comments = models.TextField(blank=True)
+    
     economic_code = models.CharField("کد اقتصادی خریدار", max_length=15, blank=True, null=True) #new by darbandi
     postcode = models.CharField("کد پستی خریدار", max_length=10, blank=True, null=True) #new by darbandi
     national_id = models.CharField("شناسه ملی خریدار", max_length=50, blank=True, null=True) #new by darbandi
+
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -364,7 +364,7 @@ class Sales(models.Model):
     date = models.DateTimeField(default=timezone.now, null=True)
     status = models.CharField(max_length=255, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], null=True)
     payment_date = models.DateTimeField(null=True)
-    customer_name = models.ForeignKey(Customer, related_name='sales', on_delete=models.CASCADE)
+    customer_name = models.CharField(max_length=255, null=False)
     license_number = models.CharField(max_length=255, null=True)
     list_of_reels = models.TextField(null=True)
     width = models.IntegerField(null=True, blank=True)
@@ -392,35 +392,8 @@ class Sales(models.Model):
         db_table = 'Sales'
         verbose_name_plural = "Sales"
 
-    def clean(self):
-        """
-        Validates that only one Sales record can have invoice_status='NA' at a time.
-        """
-        # Only check for 'NA' constraint if this record has 'NA' status
-        if self.invoice_status == 'NA':
-            # Check if there are other Sales records with 'NA' status
-            existing_na = Sales.objects.filter(invoice_status='NA')
-            
-            # If this is an existing record, exclude it from the check
-            if self.pk:
-                existing_na = existing_na.exclude(pk=self.pk)
-            
-            # If there's already another 'NA' record, raise error
-            if existing_na.exists():
-                raise ValidationError(
-                    "There can only be one pending invoice (with status 'NA') at a time. "
-                    "Please confirm or cancel the existing pending invoice before creating a new one."
-                )
-
-    def save(self, *args, **kwargs):
-        """
-        Override save method to run clean() before saving.
-        """
-        self.clean()
-        super().save(*args, **kwargs)
-
     def __str__(self):
-        return f"Sale (ID: {self.id}, Date: {self.date}, Customer: {self.customer_name})"
+        return f"Sale (ID: {self.id}, Date: {self.date}, Customer: {self.customer})"
 
 
 class AnbarGeneric(models.Model):
@@ -781,3 +754,29 @@ class Alert(models.Model):
 
     class Meta:
         db_table = 'Alert'
+
+
+class AdminUser(models.Model):
+    """
+    Model representing an admin user in the system.
+
+    Attributes:
+        username (str): Unique username for the admin
+        password (str): Hashed password for the admin
+        is_active (bool): Whether the admin account is active
+        created_at (datetime): When the admin account was created
+        last_login (datetime): When the admin last logged in
+    """
+    username = models.CharField(max_length=100, unique=True)
+    password = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    last_login = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'AdminUser'
+        verbose_name = 'Admin User'
+        verbose_name_plural = 'Admin Users'
+
+    def __str__(self):
+        return f"Admin: {self.username}"

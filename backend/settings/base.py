@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from config import Config
+
 # Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -9,7 +10,7 @@ SECRET_KEY = Config.SECRET_KEY
 DEBUG = Config.DEBUG
 ALLOWED_HOSTS = ['*'] if DEBUG else ['your-production-domain.com']
 
-# Installed apps
+
 INSTALLED_APPS = [
     "daphne",
     "django.contrib.admin",
@@ -69,10 +70,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = "fa"  # Farsi
+LANGUAGE_CODE = "fa-ir"
 TIME_ZONE = "Asia/Tehran"
 USE_I18N = True
 USE_TZ = False
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -91,18 +97,3 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Add this for WeasyPrint
-STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-]

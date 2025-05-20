@@ -1,0 +1,12 @@
+@font-face {
+    font-family: 'BDavat';
+    src: url('../fonts/BDavat.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+    font-family: 'BDavat', Tahoma, Arial, sans-serif;
+    direction: rtl;
+}

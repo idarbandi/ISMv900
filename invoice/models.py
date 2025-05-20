@@ -10,7 +10,7 @@ class Invoice(models.Model):
     has its invoice_status changed from 'NA' to 'Sent'.
     """
     # Link to the original sale
-    sale = models.OneToOneField(Sales, on_delete=models.CASCADE, related_name='invoice')
+    sale = models.ForeignKey(Sales, on_delete=models.CASCADE, null=True, blank=True)
     
     # Invoice date components (for easier filtering/searching)
     year = models.IntegerField()

@@ -15,9 +15,6 @@ DATABASES = {
     }
 }
 
-# If you're in production, you might also need:
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
 # Security settings
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True

@@ -1,23 +1,29 @@
-version: '3.9'
+version: '3'
 
 services:
-  web:
+  backend:
     build: .
-    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "0.0.0.0:8000:8000"
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
     environment:
       - DEBUG=1
-      - SECRET_KEY=your_secret_key_here
-      - DB_NAME=mydatabase
-      - DB_USER=admin
-      - DB_PASSWORD=pi
-      - DB_HOST=db
-      - DB_PORT=5432
-    depends_on:
-      - db
+      - DJANGO_SETTINGS_MODULE=myproject.settings
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "0.0.0.0:8080:8080"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run serve
 
   db:
     image: postgres:15-alpine
