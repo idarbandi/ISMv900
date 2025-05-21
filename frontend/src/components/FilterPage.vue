@@ -107,6 +107,9 @@ const FILTER_QUERY = gql`
         id
         licenseNumber
         driverName
+        status
+        location
+        phone
       }
       ... on SalesType {
         id
@@ -162,20 +165,30 @@ export default {
     }
 
     const getItemType = (item) => {
-      if (item.licenseNumber) return 'کامیون'
-      if (item.customerName && item.nationalId) return 'مشتری'
-      if (item.shipmentType) return 'ارسال'
-      if (item.totalPrice) return 'فاکتور فروش'
-      if (item.profileName) return 'محصول'
+      if (item.__typename === 'TruckType') return 'کامیون'
+      if (item.__typename === 'CustomerType') return 'مشتری'
+      if (item.__typename === 'ShipmentType') return 'ارسال'
+      if (item.__typename === 'SalesType') return 'فاکتور فروش'
+      if (item.__typename === 'ProductType') return 'محصول'
       return 'نامشخص'
     }
 
     const getItemInfo = (item) => {
-      if (item.licenseNumber) return `پلاک: ${item.licenseNumber} (راننده: ${item.driverName || 'نامشخص'})`
-      if (item.customerName && item.nationalId) return `مشتری: ${item.customerName} (کد ملی: ${item.nationalId})`
-      if (item.shipmentType) return `نوع ارسال: ${item.shipmentType}`
-      if (item.totalPrice) return `مبلغ کل: ${item.totalPrice} تومان`
-      if (item.profileName) return `محصول: ${item.profileName}`
+      if (item.__typename === 'TruckType') {
+        return `پلاک: ${item.licenseNumber || 'نامشخص'}, راننده: ${item.driverName || 'نامشخص'}, وضعیت: ${item.status || 'نامشخص'}, مکان: ${item.location || 'نامشخص'}, تلفن: ${item.phone || 'نامشخص'}`
+      }
+      if (item.__typename === 'CustomerType') {
+        return `مشتری: ${item.customerName || 'نامشخص'} (کد ملی: ${item.nationalId || 'نامشخص'})`
+      }
+      if (item.__typename === 'ShipmentType') {
+        return `نوع ارسال: ${item.shipmentType || 'نامشخص'}`
+      }
+      if (item.__typename === 'SalesType') {
+        return `مبلغ کل: ${item.totalPrice || 'نامشخص'} تومان`
+      }
+      if (item.__typename === 'ProductType') {
+        return `محصول: ${item.profileName || 'نامشخص'}`
+      }
       return 'اطلاعات نامشخص'
     }
 

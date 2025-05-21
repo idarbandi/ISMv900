@@ -2,6 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from django.contrib.auth import get_user_model
 from myapp.models import Customer, Products, Sales, Shipments, Truck
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -13,7 +14,7 @@ class UserType(DjangoObjectType):
 class TruckType(DjangoObjectType):
     class Meta:
         model = Truck
-        fields = ('id', 'license_number', 'driver_name')
+        fields = '__all__' # Include all fields from the Truck model
 
 class SalesType(DjangoObjectType):
     class Meta:
@@ -41,13 +42,13 @@ class FilterInput(graphene.InputObjectType):
     customer = graphene.ID()
     product = graphene.ID()
     shipment = graphene.ID()
-    truck_license_number = graphene.String()
-    driver_name = graphene.String()
-    shipment_type = graphene.String()
-    supplier_name = graphene.String()
-    customer_national_id = graphene.String()
-    min_amount = graphene.Float()
-    max_amount = graphene.Float()
+    truckLicenseNumber = graphene.String()
+    driverName = graphene.String()
+    shipmentType = graphene.String()
+    supplierName = graphene.String()
+    customerNationalId = graphene.String()
+    minAmount = graphene.Float()
+    maxAmount = graphene.Float()
 
 # Define the Union type
 class FilterResultUnion(graphene.Union):
@@ -58,30 +59,15 @@ class Query(graphene.ObjectType):
     filteredData = graphene.List(FilterResultUnion, filterInput=graphene.Argument(FilterInput))
 
     def resolve_filteredData(self, info, filterInput=None):
-        # For testing, return some dummy Django model instances
-        return [
-            Truck(
-                pk=1,
-                license_number="123ABC",
-                driver_name="John Doe"
-            ),
-            Shipments(
-                pk=1,
-                shipment_type="Incoming",
-            ),
-            Products(
-                pk=1,
-                profile_name="Test Product",
-            ),
-            Customer(
-                pk=1,
-                customer_name="Test Customer",
-                national_id="1234567890"
-            ),
-            Sales(
-                pk=1,
-                total_price=1000.00
-            )
-        ]
+        queryset = []
+
+        # Filter Trucks by license number
+        if filterInput and filterInput.truckLicenseNumber:
+            trucks = Truck.objects.filter(license_number__icontains=filterInput.truckLicenseNumber)
+            queryset.extend(list(trucks))
+
+        # TODO: Implement filtering for other models and combine the results
+
+        return queryset
 
 schema = graphene.Schema(query=Query) 
