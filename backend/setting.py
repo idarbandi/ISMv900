@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "myapp.apps.MyappConfig",
     "channels",
     "invoice.apps.InvoiceConfig", # New
+    "graphene_django", # Added
 ]
 
 MIDDLEWARE = [
@@ -92,3 +93,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+GRAPHENE = {
+    'SCHEMA': 'filter.schema.schema',
+}

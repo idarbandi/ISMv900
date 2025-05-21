@@ -7,10 +7,14 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.8",
+    "@vue/apollo-composable": "^4.2.2",
     "autoprefixer": "^10",
     "axios": "^1.6.7",
     "core-js": "^3.8.3",
     "flowbite": "^2.3.0",
+    "graphql": "^16.11.0",
+    "graphql-tag": "^2.12.6",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.3",
     "jalaali-js": "^1.2.8",

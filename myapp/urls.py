@@ -3,6 +3,8 @@ from .views import *
 from invoice.views import *
 from django.conf.urls.static import static
 from django.conf import settings
+from graphene_django.views import GraphQLView
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     path("api/checkLicenseNumber", check_license_number),
@@ -79,4 +81,5 @@ urlpatterns = [
     path("admin/cancel/", cancel, name='cancel_action'),
     path("admin/report/", report_page, name='report_page'),
     path("admin/login/", admin_login2, name='admin_login'),
+    path("filter/graphql/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
 ]

@@ -24,6 +24,7 @@ import AdminLogin from '../components/admin/AdminLogin.vue'
 import ReportLogin from '../components/admin/ReportLogin.vue'
 import Havaleh from '@/components/Havaleh.vue'
 import salesorder from '@/components/salesorder.vue';
+import FilterPage from '@/components/FilterPage.vue';
 
 const routes = [
   {
@@ -169,6 +170,11 @@ const routes = [
   {
     path: '/myapp/invoice/havaleh',
     component: () => import('@/components/Havaleh.vue'),
+  },
+  {
+    path: '/myapp/filter/',
+    name: 'Filter',
+    component: FilterPage
   },
 ]
 

@@ -43,7 +43,8 @@ export default {
         { path: '/myapp/cancel/', name: 'cancel' },
         { path: '/myapp/report/', name: 'report' },
         { path: '/myapp/ProductsPage/', name: 'ProductsPage' },
-        { path: '/myapp/invoice/', name: 'Invoice' } // Added the Invoice button
+        { path: '/myapp/invoice/', name: 'Invoice' },
+        { path: '/myapp/filter/', name: 'فیلتر داده‌ها' }
       ]
     }
   }
