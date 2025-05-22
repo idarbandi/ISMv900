@@ -61,10 +61,21 @@ class Query(graphene.ObjectType):
     def resolve_filteredData(self, info, filterInput=None):
         queryset = []
 
+        # Start with an empty Q object for combined filtering
+        combined_filter = Q()
+
         # Filter Trucks by license number
         if filterInput and filterInput.truckLicenseNumber:
-            trucks = Truck.objects.filter(license_number__icontains=filterInput.truckLicenseNumber)
-            queryset.extend(list(trucks))
+            combined_filter |= Q(license_number__icontains=filterInput.truckLicenseNumber)
+
+        # Filter Trucks by driver name
+        if filterInput and filterInput.driverName:
+            combined_filter |= Q(driver_name__icontains=filterInput.driverName)
+
+        # Apply the combined filter to the Truck model
+        if combined_filter:
+             trucks = Truck.objects.filter(combined_filter)
+             queryset.extend(list(trucks))
 
         # TODO: Implement filtering for other models and combine the results
 
