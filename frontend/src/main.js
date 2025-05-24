@@ -6,7 +6,8 @@ import VueAxios from 'vue-axios';
 import './assets/tailwind.css'
 import { Html2CanvasPlugin } from 'vue3-html2canvas';
 import './assets/styles/fonts.css'
-import { setupApollo } from './apollo'
+import { apolloClient } from './apollo'
+import { DefaultApolloClient } from '@vue/apollo-composable'
 
 // Configure axios
 axios.defaults.xsrfCookieName = 'csrftoken';
@@ -18,5 +19,9 @@ const app = createApp(App)
 app.use(VueAxios, axios)
 app.use(router)
 app.use(Html2CanvasPlugin);
-setupApollo(app)
+
+// Set up Apollo
+app.provide(DefaultApolloClient, apolloClient)
+app.config.globalProperties.$apollo = apolloClient
+
 app.mount('#app')

@@ -43,4 +43,6 @@ export const apolloClient = new ApolloClient({
 
 export function setupApollo(app) {
   app.provide(DefaultApolloClient, apolloClient)
+  // Make apollo client available globally
+  app.config.globalProperties.$apollo = apolloClient
 } 

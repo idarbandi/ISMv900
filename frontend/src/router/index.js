@@ -24,7 +24,7 @@ import AdminLogin from '../components/admin/AdminLogin.vue'
 import ReportLogin from '../components/admin/ReportLogin.vue'
 import Havaleh from '@/components/Havaleh.vue'
 import salesorder from '@/components/salesorder.vue';
-import FilterPage from '@/components/FilterPage.vue';
+import FilterPage from '@/components/filterPages/FilterPage.vue';
 
 const routes = [
   {
