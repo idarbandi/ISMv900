@@ -45,7 +45,41 @@ class ProductType(DjangoObjectType):
 class ShipmentType(DjangoObjectType):
     class Meta:
         model = Shipments
-        fields = ('id', 'shipment_type')
+        fields = (
+            'id', 'date', 'status', 'location', 'receive_date', 'entry_time',
+            'weight1_time', 'weight2_time', 'exit_time', 'shipment_type',
+            'license_number', 'customer_name', 'supplier_name', 'weight1',
+            'unload_location', 'unit', 'quantity', 'quality', 'penalty',
+            'weight2', 'net_weight', 'list_of_reels', 'profile_name', 'width',
+            'sales_id', 'price_per_kg', 'total_price', 'extra_cost',
+            'material_type', 'material_name', 'vat', 'invoice_status',
+            'payment_status', 'document_info', 'comments', 'cancellation_reason',
+            'username', 'logs'
+        )
+
+    # Convert snake_case to camelCase
+    receive_date = graphene.DateTime(source='receive_date')
+    entry_time = graphene.DateTime(source='entry_time')
+    weight1_time = graphene.DateTime(source='weight1_time')
+    weight2_time = graphene.DateTime(source='weight2_time')
+    exit_time = graphene.DateTime(source='exit_time')
+    shipment_type = graphene.String(source='shipment_type')
+    license_number = graphene.String(source='license_number')
+    customer_name = graphene.String(source='customer_name')
+    supplier_name = graphene.String(source='supplier_name')
+    unload_location = graphene.String(source='unload_location')
+    list_of_reels = graphene.String(source='list_of_reels')
+    profile_name = graphene.String(source='profile_name')
+    sales_id = graphene.Int(source='sales_id')
+    price_per_kg = graphene.BigInt(source='price_per_kg')
+    total_price = graphene.BigInt(source='total_price')
+    extra_cost = graphene.BigInt(source='extra_cost')
+    material_type = graphene.String(source='material_type')
+    material_name = graphene.String(source='material_name')
+    invoice_status = graphene.String(source='invoice_status')
+    payment_status = graphene.String(source='payment_status')
+    document_info = graphene.String(source='document_info')
+    cancellation_reason = graphene.String(source='cancellation_reason')
 
 class FilterInput(graphene.InputObjectType):
     startDate = graphene.Date()
@@ -71,6 +105,21 @@ class FilterInput(graphene.InputObjectType):
     productProfileName = graphene.String()
     minBreaks = graphene.Int()
     maxBreaks = graphene.Int()
+    # Shipment specific filters
+    shipmentStatus = graphene.String()
+    shipmentLocation = graphene.String()
+    licenseNumber = graphene.String()
+    customerName = graphene.String()
+    weight1 = graphene.Int()
+    weight2 = graphene.Int()
+    netWeight = graphene.String()
+    materialType = graphene.String()
+    materialName = graphene.String()
+    pricePerKg = graphene.Int()
+    totalPrice = graphene.Int()
+    extraCost = graphene.Int()
+    invoiceStatus = graphene.String()
+    paymentStatus = graphene.String()
 
 # Define the Union type
 class FilterResultUnion(graphene.Union):
@@ -159,6 +208,76 @@ class Query(graphene.ObjectType):
             # If no filters are applied, return all products
             products = Products.objects.all()
             queryset.extend(list(products))
+
+        # Shipment filtering
+        shipment_filter = Q()
+        if filterInput:
+            # Filter by shipment type
+            if filterInput.shipmentType:
+                shipment_filter &= Q(shipment_type=filterInput.shipmentType)
+            
+            # Filter by status
+            if filterInput.shipmentStatus:
+                shipment_filter &= Q(status=filterInput.shipmentStatus)
+            
+            # Filter by location
+            if filterInput.shipmentLocation:
+                shipment_filter &= Q(location__icontains=filterInput.shipmentLocation)
+            
+            # Filter by license number
+            if filterInput.licenseNumber:
+                shipment_filter &= Q(license_number__icontains=filterInput.licenseNumber)
+            
+            # Filter by customer name
+            if filterInput.customerName:
+                shipment_filter &= Q(customer_name__icontains=filterInput.customerName)
+            
+            # Filter by supplier name
+            if filterInput.supplierName:
+                shipment_filter &= Q(supplier_name__icontains=filterInput.supplierName)
+            
+            # Filter by weights
+            if filterInput.weight1:
+                shipment_filter &= Q(weight1=filterInput.weight1)
+            if filterInput.weight2:
+                shipment_filter &= Q(weight2=filterInput.weight2)
+            if filterInput.netWeight:
+                shipment_filter &= Q(net_weight=filterInput.netWeight)
+            
+            # Filter by material
+            if filterInput.materialType:
+                shipment_filter &= Q(material_type__icontains=filterInput.materialType)
+            if filterInput.materialName:
+                shipment_filter &= Q(material_name__icontains=filterInput.materialName)
+            
+            # Filter by prices
+            if filterInput.pricePerKg:
+                shipment_filter &= Q(price_per_kg=filterInput.pricePerKg)
+            if filterInput.totalPrice:
+                shipment_filter &= Q(total_price=filterInput.totalPrice)
+            if filterInput.extraCost:
+                shipment_filter &= Q(extra_cost=filterInput.extraCost)
+            
+            # Filter by statuses
+            if filterInput.invoiceStatus:
+                shipment_filter &= Q(invoice_status=filterInput.invoiceStatus)
+            if filterInput.paymentStatus:
+                shipment_filter &= Q(payment_status=filterInput.paymentStatus)
+            
+            # Filter by date range
+            if filterInput.startDate:
+                shipment_filter &= Q(date__gte=filterInput.startDate)
+            if filterInput.endDate:
+                shipment_filter &= Q(date__lte=filterInput.endDate)
+
+        # Apply shipment filters if any exist
+        if shipment_filter:
+            shipments = Shipments.objects.filter(shipment_filter)
+            queryset.extend(list(shipments))
+        else:
+            # If no filters are applied, return all shipments
+            shipments = Shipments.objects.all()
+            queryset.extend(list(shipments))
 
         return queryset
 
