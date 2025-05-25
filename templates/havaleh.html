@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
+
 <head>
     <meta charset="UTF-8">
     <title>حواله خروج از انبار</title>
@@ -18,11 +19,13 @@
             padding: 0;
             background: white;
             direction: rtl;
+            font-size: 20pt;
         }
 
         /* Center the whole havaleh block and set a fixed width */
         .havaleh-copy {
-            width: 650px; /* Adjust this width as needed for your print/PDF size */
+            width: 650px;
+            /* Adjust this width as needed for your print/PDF size */
             margin: 24px auto;
             border: 1px solid #222;
             background: #fff;
@@ -39,10 +42,12 @@
             align-items: flex-start;
             margin-bottom: 14px;
         }
+
         .logo-section {
             width: 70px;
             text-align: right;
         }
+
         .logo-section img {
             width: 55px;
             height: 55px;
@@ -50,24 +55,29 @@
             display: block;
             margin-bottom: 2px;
         }
+
         .logo-section div {
             font-size: 9pt;
             text-align: center;
         }
+
         .company-info {
             flex: 1;
             text-align: center;
             margin: 0 5px;
         }
+
         .company-name {
             font-size: 13pt;
             font-weight: bold;
             margin-bottom: 2px;
         }
+
         .document-title {
             font-size: 11pt;
             margin-bottom: 0;
         }
+
         .document-info {
             width: 120px;
             text-align: left;
@@ -81,6 +91,7 @@
             display: flex;
             justify-content: center;
         }
+
         table {
             width: 97%;
             margin: 0 auto;
@@ -88,7 +99,9 @@
             font-size: 10pt;
             table-layout: fixed;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #222;
             padding: 7px 6px 6px 6px;
             text-align: center;
@@ -97,17 +110,39 @@
             white-space: nowrap;
             font-family: 'BDavat', Arial, sans-serif;
         }
+
         th {
             background-color: #f7f7f7;
             font-weight: bold;
         }
-        .col-1 { width: 7%; }
-        .col-2 { width: 24%; }
-        .col-3 { width: 10%; }
-        .col-4 { width: 13%; }
-        .col-5 { width: 20%; }
-        .col-6 { width: 13%; }
-        .col-7 { width: 13%; }
+
+        .col-1 {
+            width: 7%;
+        }
+
+        .col-2 {
+            width: 24%;
+        }
+
+        .col-3 {
+            width: 10%;
+        }
+
+        .col-4 {
+            width: 13%;
+        }
+
+        .col-5 {
+            width: 20%;
+        }
+
+        .col-6 {
+            width: 13%;
+        }
+
+        .col-7 {
+            width: 13%;
+        }
 
         .total-row td {
             font-weight: bold;
@@ -121,6 +156,7 @@
             font-size: 9pt;
             line-height: 1.7;
         }
+
         .footer {
             display: flex;
             justify-content: space-between;
@@ -130,6 +166,7 @@
             left: 16px;
             right: 16px;
         }
+
         .signature-line {
             flex: 1;
             text-align: center;
@@ -137,6 +174,7 @@
             padding-top: 2px;
             font-size: 9pt;
         }
+
         .confirmation-text {
             text-align: right;
             font-size: 9pt;
@@ -146,6 +184,7 @@
         }
     </style>
 </head>
+
 <body>
     {% for i in '123'|make_list %}
     <div class="havaleh-copy">
@@ -207,9 +246,10 @@
             <div class="signature-line">تحویل گیرنده</div>
         </div>
         <div class="confirmation-text">
-            بار صحیح و سالم تحویل اینجانب گردید.
+            بار صحیح و سالم تحویل اینجانب ........... گردید.
         </div>
     </div>
     {% endfor %}
 </body>
+
 </html>

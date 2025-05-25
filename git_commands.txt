@@ -1,0 +1,33 @@
+# دستورات گیت برای آپلود پروژه به گیت‌هاب
+
+# 1. چک کردن وضعیت گیت
+git status
+
+# 2. اضافه کردن همه فایل‌ها به گیت
+git add .
+
+# 3. کامیت کردن تغییرات
+git commit -m "Initial commit: Complete project setup"
+
+# 4. چک کردن ریموت‌ها
+git remote -v
+
+# 5. چک کردن شاخه فعلی
+git branch
+
+# 6. تلاش برای پوش به شاخه DevP
+git push origin DevP
+
+# 7. تلاش برای پول از ریموت
+git pull origin DevP
+
+# 8. تلاش برای پول با اجازه مرج تاریخچه‌های نامرتبط
+git pull origin DevP --allow-unrelated-histories
+
+# 9. کنسل کردن مرج
+git merge --abort
+
+# 10. پوش فورس به ریموت (این دستور نهایی بود که موفقیت‌آمیز بود)
+
+# 11. اضافه کردن ریموت جدید
+git remote add parsa-origin https://github.com/Parsa-Parvizi/Homayoun-Project.git 

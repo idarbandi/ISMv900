@@ -32,6 +32,10 @@ from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
 from .models import Shipments
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import Shipments
 
 datetime_fields = ['receive_date', 'entry_time', 'weight1_time', 'weight2_time', 'exit_time', 'date', 'payment_date']
 
@@ -2712,121 +2716,145 @@ def add_consumption_profile(request):
         return render(request, 'add_consumption_profile.html')
 
 
+# @csrf_exempt
+# def cancel(request):
+#     if request.method == 'POST':
+#         license_number = request.GET.get('license_number')
+#         shipment_obj = request.GET.get('shipment')
+#         shipment_obj = json.loads(shipment_obj)
+#         anbar_location = request.GET.get('unloading_location')
+#         cancellation_reason = request.GET.get('reason')
+#         username = request.GET.get('username')
+
+#         status = 'Cancelled'
+#         location = 'Cancelled'
+#         action = 'Cancelled'
+#         # print(shipment_obj)
+#         shipment = Shipments.objects.get(id=shipment_obj['id'])
+#         # Update the attributes of the shipment instance
+#         shipment.status = status
+#         shipment.location = location
+#         shipment.cancellation_reason = cancellation_reason
+#         shipment.logs = shipment.logs + log_generator(username, action)
+#         # Save the updated instance to the database
+#         shipment.save()
+
+#         # Update truck status and location
+#         Truck.objects.filter(license_number=license_number).update(
+#             status='Free',
+#             location='Entrance'
+#         )
+
+#         if shipment.shipment_type == "Incoming":
+#             purchases = Purchases.objects.filter(shipment_id=shipment)
+
+#             if purchases.exists():
+#                 purchases.update(
+#                     status=status,
+#                     cancellation_reason=cancellation_reason,
+#                     logs=purchases[0].logs + log_generator(username, action)
+#                 )
+
+#             if shipment.unload_location:
+#                 AnbarModel = apps.get_model('myapp', shipment.unload_location)
+#                 anbar = AnbarModel.objects.filter(
+#                     # supplier_name=shipment.supplier_name,
+#                     # material_name=shipment.material_name,
+#                     # status="In-stock",
+#                     shipment_id=shipment
+#                 )
+#                 if anbar.exists():
+#                     anbar = anbar.order_by('receive_date')[:int(shipment.quantity)]
+#                     for record in anbar:
+#                         record.status = status
+#                         record.location = location
+#                         record.last_date = get_time()
+#                         record.logs = record.logs + log_generator(username, action)
+#                         record.save()
+#         else:
+#             sales = Sales.objects.filter(shipment=shipment)
+#             if sales.exists():
+#                 sales.update(
+#                     status=status,
+#                     cancellation_reason=cancellation_reason,
+#                     logs=sales[0].logs + log_generator(username, action)
+#                 )
+#             if shipment.list_of_reels:
+#                 # print(shipment.list_of_reels)
+#                 list_of_reel = shipment.list_of_reels.split(',')
+#                 for reel in list_of_reel:
+#                     # print(reel)
+#                     # reel = int(reel)
+#                     product = Products.objects.get(reel_number=reel)
+#                     # print(product)
+#                     product.location = anbar_location
+#                     product.status = 'In-stock'
+#                     product.last_date = None
+#                     product.logs = product.logs + log_generator(username, action)
+#                     product.save()
+
+#                     AnbarModel = apps.get_model('myapp', anbar_location)
+#                     anbar_a = AnbarModel(
+#                         reel_number=reel,
+#                         width=product.width,
+#                         gsm=product.gsm,
+#                         length=product.length,
+#                         grade=product.grade,
+#                         breaks=product.breaks,
+#                         comments=product.comments,
+#                         qr_code=product.qr_code,
+#                         profile_name=product.profile_name,
+#                         username=product.username,
+#                         status='In-stock',
+#                         location=anbar_location,
+#                         receive_date=get_time(),
+#                         logs=log_generator(username, 'Cancelled and Added') + append_log({'comments': product.comments}, 'Cancel')
+#                     )
+#                     anbar_a.save()
+#                     if shipment.unload_location:
+#                         AnbarModel = apps.get_model('myapp', shipment.unload_location)
+#                         anbar = AnbarModel.objects.filter(
+#                             reel_number=reel,
+#                             shipment_id=shipment
+#                         )
+#                         if anbar.exists():
+#                             # anbar = anbar.order_by('receive_date')[:int(shipment.quantity)]
+#                             for record in anbar:
+#                                 record.status = status
+#                                 record.location = location
+#                                 # record.last_date = get_time()
+#                                 record.logs = record.logs + log_generator(username, action)
+#                                 record.save()
+
+#         # Return a success response
+#         return JsonResponse({'status': 'success', 'message': ''})
+
+#     else:
+#         return render(request, 'cancell_shipment.html')
+
+
+
 @csrf_exempt
+@login_required(login_url='admin_login')
 def cancel(request):
     if request.method == 'POST':
-        license_number = request.GET.get('license_number')
-        shipment_obj = request.GET.get('shipment')
-        shipment_obj = json.loads(shipment_obj)
-        anbar_location = request.GET.get('unloading_location')
-        cancellation_reason = request.GET.get('reason')
-        username = request.GET.get('username')
+        try:
+            license_number = request.POST.get('license_number')
+            if not license_number:
+                return JsonResponse({'error': 'شماره بارنامه الزامی است'}, status=400)
 
-        status = 'Cancelled'
-        location = 'Cancelled'
-        action = 'Cancelled'
-        # print(shipment_obj)
-        shipment = Shipments.objects.get(id=shipment_obj['id'])
-        # Update the attributes of the shipment instance
-        shipment.status = status
-        shipment.location = location
-        shipment.cancellation_reason = cancellation_reason
-        shipment.logs = shipment.logs + log_generator(username, action)
-        # Save the updated instance to the database
-        shipment.save()
+            shipment = Shipments.objects.filter(license_number=license_number).first()
+            if not shipment:
+                return JsonResponse({'error': 'بارنامه یافت نشد'}, status=404)
 
-        # Update truck status and location
-        Truck.objects.filter(license_number=license_number).update(
-            status='Free',
-            location='Entrance'
-        )
-
-        if shipment.shipment_type == "Incoming":
-            purchases = Purchases.objects.filter(shipment_id=shipment)
-
-            if purchases.exists():
-                purchases.update(
-                    status=status,
-                    cancellation_reason=cancellation_reason,
-                    logs=purchases[0].logs + log_generator(username, action)
-                )
-
-            if shipment.unload_location:
-                AnbarModel = apps.get_model('myapp', shipment.unload_location)
-                anbar = AnbarModel.objects.filter(
-                    # supplier_name=shipment.supplier_name,
-                    # material_name=shipment.material_name,
-                    # status="In-stock",
-                    shipment_id=shipment
-                )
-                if anbar.exists():
-                    anbar = anbar.order_by('receive_date')[:int(shipment.quantity)]
-                    for record in anbar:
-                        record.status = status
-                        record.location = location
-                        record.last_date = get_time()
-                        record.logs = record.logs + log_generator(username, action)
-                        record.save()
-        else:
-            sales = Sales.objects.filter(shipment=shipment)
-            if sales.exists():
-                sales.update(
-                    status=status,
-                    cancellation_reason=cancellation_reason,
-                    logs=sales[0].logs + log_generator(username, action)
-                )
-            if shipment.list_of_reels:
-                # print(shipment.list_of_reels)
-                list_of_reel = shipment.list_of_reels.split(',')
-                for reel in list_of_reel:
-                    # print(reel)
-                    # reel = int(reel)
-                    product = Products.objects.get(reel_number=reel)
-                    # print(product)
-                    product.location = anbar_location
-                    product.status = 'In-stock'
-                    product.last_date = None
-                    product.logs = product.logs + log_generator(username, action)
-                    product.save()
-
-                    AnbarModel = apps.get_model('myapp', anbar_location)
-                    anbar_a = AnbarModel(
-                        reel_number=reel,
-                        width=product.width,
-                        gsm=product.gsm,
-                        length=product.length,
-                        grade=product.grade,
-                        breaks=product.breaks,
-                        comments=product.comments,
-                        qr_code=product.qr_code,
-                        profile_name=product.profile_name,
-                        username=product.username,
-                        status='In-stock',
-                        location=anbar_location,
-                        receive_date=get_time(),
-                        logs=log_generator(username, 'Cancelled and Added') + append_log({'comments': product.comments}, 'Cancel')
-                    )
-                    anbar_a.save()
-                    if shipment.unload_location:
-                        AnbarModel = apps.get_model('myapp', shipment.unload_location)
-                        anbar = AnbarModel.objects.filter(
-                            reel_number=reel,
-                            shipment_id=shipment
-                        )
-                        if anbar.exists():
-                            # anbar = anbar.order_by('receive_date')[:int(shipment.quantity)]
-                            for record in anbar:
-                                record.status = status
-                                record.location = location
-                                # record.last_date = get_time()
-                                record.logs = record.logs + log_generator(username, action)
-                                record.save()
-
-        # Return a success response
-        return JsonResponse({'status': 'success', 'message': ''})
-
-    else:
-        return render(request, 'cancell_shipment.html')
+            shipment.status = 'لغو شده'
+            shipment.save()
+            
+            return JsonResponse({'success': True, 'message': 'بارنامه با موفقیت لغو شد'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return render(request, 'cancel.html')
 
 
 @csrf_exempt
@@ -2954,12 +2982,9 @@ def loadReportData(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
-@csrf_exempt
+@login_required(login_url='admin_login')
 def report_page(request):
-    if request.method == 'POST':
-        pass
-    else:
-        return render(request, 'report_page.html')
+    return render(request, 'report_page.html')
 
 
 @csrf_exempt
@@ -3476,11 +3501,37 @@ def all_pages(request):
     if request.method == 'GET':
         return render(request, 'all_pages.html')
 
+# دیکشنری تبدیل نام‌های انگلیسی به فارسی
+LOCATION_TRANSLATIONS = {
+    'Anbar_Khamir_Ghadim': 'انبار خمیر قدیم',
+    'Anbar_Khamir_Jadid': 'انبار خمیر جدید',
+    'Anbar_Khamir_Asli': 'انبار خمیر اصلی',
+    'Anbar_Khamir_Motavaset': 'انبار خمیر متوسط',
+    'Anbar_Khamir_Kuchak': 'انبار خمیر کوچک',
+    'Anbar_Khamir_Bozorg': 'انبار خمیر بزرگ',
+    'Anbar_Salon_Tolid': 'انبار سالن تولید',
+    'Anbar_Sangin': 'انبار سنگین',
+    'In-stock': 'موجود در انبار',
+    'Out-of-stock': 'ناموجود',
+    'Reserved': 'رزرو شده',
+    'In-transit': 'در حال انتقال',
+    'Damaged': 'آسیب دیده',
+    'Returned': 'برگشتی',
+    'Sold': 'فروخته شده',
+    'Pending': 'در انتظار',
+    'Processing': 'در حال پردازش',
+    'Shipped': 'ارسال شده',
+    'Delivered': 'تحویل داده شده',
+    'Cancelled': 'لغو شده',
+    'On-hold': 'متوقف شده',
+    'Back-ordered': 'سفارش مجدد',
+}
+
 @csrf_exempt
 def products_page(request):
     try:
         if request.method == 'POST':
-            filter_type = request.GET.get('filter')
+            filter_type = request.GET.get('filter') or request.POST.get('filter')
             current_time = timezone.now()
             # Get all table names from the database
             all_table_names = connection.introspection.table_names()
@@ -3488,58 +3539,145 @@ def products_page(request):
             all_results = []
 
             for anbar_table_name in anbar_table_names:
-                model = apps.get_model('myapp', anbar_table_name)
+                try:
+                    model = apps.get_model('myapp', anbar_table_name)
 
-                if filter_type == 'year':
-                    products = model.objects.filter(receive_date__year=current_time.year,status='In-stock', width__isnull=False)
-                elif filter_type == 'month':
-                    products = model.objects.filter(receive_date__month=current_time.month, status='In-stock', width__isnull=False)
-                elif filter_type == 'week':
-                    start_of_last_week = current_time - timedelta(days=6)
-                    end_of_last_week = current_time
-                    products = model.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week), status='In-stock', width__isnull=False)
-                elif filter_type == 'day':
-                    hours_ago = current_time - timedelta(hours=24)
-                    products = model.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time, status='In-stock', width__isnull=False)
-                else:
-                    return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+                    if filter_type == 'year':
+                        products = model.objects.filter(receive_date__year=current_time.year, status='In-stock', width__isnull=False)
+                    elif filter_type == 'month':
+                        products = model.objects.filter(receive_date__month=current_time.month, status='In-stock', width__isnull=False)
+                    elif filter_type == 'week':
+                        start_of_last_week = current_time - timedelta(days=6)
+                        end_of_last_week = current_time
+                        products = model.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week), status='In-stock', width__isnull=False)
+                    elif filter_type == 'day':
+                        hours_ago = current_time - timedelta(hours=24)
+                        products = model.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time, status='In-stock', width__isnull=False)
+                    else:
+                        return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
 
-                result = products.values('width', 'location', 'status').annotate(quantity=Count('id')).order_by('-width')
-                all_results.extend(result)
+                    result = products.values('width', 'location', 'status').annotate(quantity=Count('id')).order_by('-width')
+                    
+                    # تبدیل نام‌ها به فارسی
+                    for item in result:
+                        if item['location'] in LOCATION_TRANSLATIONS:
+                            item['location'] = LOCATION_TRANSLATIONS[item['location']]
+                        if item['status'] in LOCATION_TRANSLATIONS:
+                            item['status'] = LOCATION_TRANSLATIONS[item['status']]
+                    
+                    all_results.extend(result)
+                except Exception as e:
+                    print(f"Error processing table {anbar_table_name}: {str(e)}")
+                    continue
 
-            field_names = ['width', 'location', 'quantity', 'status',]
+            field_names = ['width', 'location', 'quantity', 'status']
             # Now sort all_results by 'location' and then by 'width'
-            # Sorting function
             def sorting_key(d):
                 # Handling None as the smallest possible value
                 width = d['width'] if d['width'] is not None else float('-inf')
                 return (d['location'], width)
 
             sorted_results = sorted(all_results, key=sorting_key)
-
-            # print(sorted_results)
-            # all_results = sorted(all_results, key=lambda x: x['width'])
-            data = {'values': sorted_results, 'fields': field_names, 'title': 'لیست محصولات', }
+            data = {'values': sorted_results, 'fields': field_names, 'title': 'لیست محصولات'}
             return JsonResponse(data=data, status=200)
-            # Group by 'width', count the number of products in each group, and order by 'location'
-
-            #
-            # if products.exists():
-            #     # for product in products:
-            #     #     for field in datetime_fields:
-            #     #         if field in product and product[field] is not None:
-            #     #             # Convert to Shamsi date
-            #     #             shamsi_date = jdatetime.datetime.fromgregorian(datetime=product[field])
-            #     #             # Update the field in the dictionary
-            #     #             product[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
-            #     #
-            #     field_names =['width','grade', 'location', 'status']
-            #
-            #     data = {'values': list(products), 'fields': field_names, 'title': 'لیست محصولات',}
-            #     return JsonResponse(data=data, status=200)
-            # else:
-            #     return JsonResponse({'status': 'error', 'message': 'No product records found'}, status=404)
         else:
             return render(request, 'products_page.html')
     except Exception as e:
+        print(f"Error in products_page: {str(e)}")  # Add debug logging
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@csrf_exempt
+def admin_login(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            password = data.get('password')
+            
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                return JsonResponse({
+                    'status': 'success',
+                    'token': 'dummy-token',  # در حالت واقعی باید JWT یا token مناسب تولید شود
+                    'is_superuser': user.is_superuser
+                })
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'نام کاربری یا رمز عبور اشتباه است'
+                }, status=401)
+                
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+            
+    return render(request, 'login.html')
+
+@csrf_exempt
+def admin_login2(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        try:
+            user = User.objects.get(username=username)
+            if user.check_password(password) and user.is_superuser:
+                # اگر کاربر ادمین است، به صفحه cancel هدایت می‌شود
+                return JsonResponse({
+                    'success': True,
+                    'redirect': '/myapp/admin/cancel/'
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'نام کاربری یا رمز عبور اشتباه است'
+                })
+        except User.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'نام کاربری یا رمز عبور اشتباه است'
+            })
+    
+    return render(request, 'admin_login.html')
+
+@csrf_exempt
+def get_products_list(request):
+    if request.method == 'GET':
+        try:
+            # Get products with status 'In-stock' and select only needed fields
+            products = Products.objects.filter(
+                status='In-stock'
+            ).values(
+                'id',
+                'profile_name',
+                'grade',
+                'gsm',
+                'width',
+                'reel_number'
+            ).order_by('-width')
+            
+            # Convert QuerySet to list and return
+            products_list = list(products)
+            print(f"Found {len(products_list)} products")  # Debug log
+            return JsonResponse({'products': products_list}, status=200)
+        except Exception as e:
+            print(f"Error in get_products_list: {str(e)}")  # Debug log
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def get_customers_list(request):
+    if request.method == 'GET':
+        try:
+            customers = Customer.objects.filter(status='Active').values(
+                'id', 'customer_name'
+            ).order_by('customer_name')
+            return JsonResponse({'customers': list(customers)}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)

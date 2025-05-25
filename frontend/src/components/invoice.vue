@@ -1,8 +1,7 @@
 <template>
   <div>
     <router-link to="/myapp/invoice/havaleh" class="btn btn-primary">havaleh</router-link>
-    <router-link to="/myapp/invoice/sales-order" class="btn btn-secondary">sales order</router-link>
-    <router-link to="/myapp/invoice/purchaseorder" class="btn btn-danger">purchases</router-link>
+    <router-link to="/myapp/invoice/sales_order" class="btn btn-secondary">sales order</router-link>
   </div>
 </template>
 

@@ -8,15 +8,11 @@ module.exports = defineConfig({
   indexPath: '../templates/_base_vue.html',
 
   devServer: {
+    host: '0.0.0.0',
     port: 8080,
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    },
-    devMiddleware: {
-      writeToDisk: true
-    },
+    allowedHosts: 'all',
     client: {
-      overlay: false
+      webSocketURL: 'auto://0.0.0.0:0/ws'
     }
   }
 });

@@ -65,6 +65,7 @@ db.sqlite3-journal
 # Flask stuff:
 instance/
 .webassets-cache
+xamppDocker.md
 
 # Scrapy stuff:
 .scrapy
@@ -74,6 +75,7 @@ docs/_build/
 
 # PyBuilder
 .pybuilder/
+job_report.md
 target/
 
 # Jupyter Notebook
@@ -173,3 +175,4 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+node_modules

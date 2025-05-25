@@ -1,13 +1,12 @@
 from django.urls import path
 from .views import *
+from invoice.views import *
 from django.conf.urls.static import static
 from django.conf import settings
-
-from invoice.views import *
+from graphene_django.views import GraphQLView
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
-    # Following paths are related to APIs:
-
     path("api/checkLicenseNumber", check_license_number),
     path("api/addTruck", add_truck),
     path("api/getMaterialTypes", get_materialTypes),
@@ -52,11 +51,11 @@ urlpatterns = [
     path("api/reportProducts", report_Products),
     path("api/reportConsumption", report_Consumption),
     path("api/reportAlert", report_Alert),
-    path("api/generate-purchase-order-pdf/", generate_purchase_order_pdf),
-    path("ProductsPage/", products_page),
-
-    # Following paths are related to Pages:
-
+    
+    path("api/products/list", get_products_list, name='get_products_list'),
+    path("api/profiles/list", get_consumption_profile_names, name='get_consumption_profile_names'),
+    path("api/customers/list", get_customers_list, name='get_customers_list'),
+    
     path("", all_pages),
     path("addCustomer/", add_customer),
     path("addSupplier/", add_supplier),
@@ -74,17 +73,13 @@ urlpatterns = [
     path("createPurchaseOrder/", create_purchase_order),
     path("createSalesOrder/", create_sales_order),
     path("forkliftPanel/", forklift_panel),
-    path("cancel/", cancel),
-    path("report/", report_page),
+    path("ProductsPage/", products_page),
 
-    
-    path("api/havaleh-pdf/", havaleh, name='havaleh-pdf'),
-    
+    # path('api/sales/create-test/', views.create_test_sales, name='create_test_sales'),
 
-    path("invoice/", invoice_page),
-    path("invoice/havaleh", havaleh),
-    path("api/sales-order-pdf/", sales_order, name='sales-order-pdf'),
-    path("invoice/sales-order", sales_order),
-    path("invoice/Purchases/", Purchases),
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
+    path("cancel/", admin_login2, name='cancel'),
+    path("admin/cancel/", cancel, name='cancel_action'),
+    path("admin/report/", report_page, name='report_page'),
+    path("admin/login/", admin_login2, name='admin_login'),
+    path("filter/graphql/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
+]

@@ -197,6 +197,11 @@ class Customer(models.Model):
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
     comments = models.TextField(blank=True)
+    
+    economic_code = models.CharField("کد اقتصادی خریدار", max_length=15, blank=True, null=True) #new by darbandi
+    postcode = models.CharField("کد پستی خریدار", max_length=10, blank=True, null=True) #new by darbandi
+    national_id = models.CharField("شناسه ملی خریدار", max_length=50, blank=True, null=True) #new by darbandi
+
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -749,3 +754,29 @@ class Alert(models.Model):
 
     class Meta:
         db_table = 'Alert'
+
+
+class AdminUser(models.Model):
+    """
+    Model representing an admin user in the system.
+
+    Attributes:
+        username (str): Unique username for the admin
+        password (str): Hashed password for the admin
+        is_active (bool): Whether the admin account is active
+        created_at (datetime): When the admin account was created
+        last_login (datetime): When the admin last logged in
+    """
+    username = models.CharField(max_length=100, unique=True)
+    password = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    last_login = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'AdminUser'
+        verbose_name = 'Admin User'
+        verbose_name_plural = 'Admin Users'
+
+    def __str__(self):
+        return f"Admin: {self.username}"
