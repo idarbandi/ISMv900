@@ -319,9 +319,15 @@ export default {
           fetchPolicy: 'network-only'
         })
 
-        if (response.data && response.data.filteredData) {
+        if (response?.data?.filteredData && 
+            Array.isArray(response.data.filteredData) && 
+            response.data.filteredData.length > 0) {
           this.productData = response.data.filteredData.filter(item => 
-            item && Object.keys(item).length > 0
+            item && 
+            typeof item === 'object' && 
+            Object.keys(item).length > 0 &&
+            item.id &&
+            item.__typename === 'ProductType'
           )
         } else {
           this.productData = []
@@ -329,6 +335,7 @@ export default {
       } catch (err) {
         this.error = 'خطا در دریافت اطلاعات'
         console.error('Filter error:', err)
+        this.productData = []
       }
 
       this.loading = false
@@ -347,9 +354,15 @@ export default {
           fetchPolicy: 'network-only'
         })
 
-        if (response.data && response.data.filteredData) {
+        if (response?.data?.filteredData && 
+            Array.isArray(response.data.filteredData) && 
+            response.data.filteredData.length > 0) {
           this.shipmentData = response.data.filteredData.filter(item => 
-            item && Object.keys(item).length > 0
+            item && 
+            typeof item === 'object' && 
+            Object.keys(item).length > 0 &&
+            item.id &&
+            item.__typename === 'ShipmentType'
           )
         } else {
           this.shipmentData = []
@@ -357,6 +370,7 @@ export default {
       } catch (err) {
         this.error = 'خطا در دریافت اطلاعات'
         console.error('Filter error:', err)
+        this.shipmentData = []
       }
 
       this.loading = false
