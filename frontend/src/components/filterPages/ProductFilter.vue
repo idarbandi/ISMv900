@@ -241,9 +241,10 @@ export default {
             }
           `
         })
+        console.log('Products loaded:', data.products) // Debug log
         this.products = data.products
         this.filteredProducts = data.products // Initially show all products
-        this.$emit('products-loaded', this.products)
+        this.$emit('filter-applied', this.products) // Emit initial data
       } catch (err) {
         this.error = 'خطا در بارگذاری محصولات'
         console.error('Error loading products:', err)

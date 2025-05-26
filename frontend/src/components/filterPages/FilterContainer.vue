@@ -423,12 +423,11 @@ export default {
       this.hasSearched = true
 
       try {
-        this.productData = filters.filter(item => 
-          item && 
-          typeof item === 'object' && 
-          Object.keys(item).length > 0 &&
-          item.id
-        )
+        console.log('Received filters:', filters) // Debug log
+        // Since we're getting the filtered products directly from ProductFilter
+        // we don't need to make another API call
+        this.productData = Array.isArray(filters) ? filters : []
+        console.log('Updated productData:', this.productData) // Debug log
       } catch (err) {
         this.error = 'خطا در دریافت اطلاعات'
         console.error('Filter error:', err)
