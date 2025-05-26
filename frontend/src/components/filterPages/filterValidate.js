@@ -170,6 +170,18 @@ const cleanStringValue = (value) => {
   return value
 }
 
+// Helper function to handle empty object responses
+export const handleEmptyResponse = (data) => {
+  if (!data) return []
+  if (Array.isArray(data)) {
+    return data.filter(item => item && typeof item === 'object' && Object.keys(item).length > 0)
+  }
+  if (typeof data === 'object' && Object.keys(data).length === 0) {
+    return []
+  }
+  return data
+}
+
 // Validation helper functions
 export const validateField = (value, rules) => {
   if (!rules) return true
@@ -223,11 +235,14 @@ export const validateForm = (form, type) => {
 
 // Helper function to clean form data
 export const cleanFormData = (form) => {
-  return Object.entries(form).reduce((acc, [key, value]) => {
+  const cleaned = Object.entries(form).reduce((acc, [key, value]) => {
     if (value !== '' && value !== null && value !== undefined) {
       // Clean string values before adding to cleaned form
       acc[key] = typeof value === 'string' ? value.trim() : value
     }
     return acc
   }, {})
+  
+  // Handle empty object responses
+  return handleEmptyResponse(cleaned)
 } 

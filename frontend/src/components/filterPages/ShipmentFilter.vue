@@ -214,6 +214,7 @@
 <script>
 import { gql } from '@apollo/client/core'
 import { apolloClient } from '@/apollo'
+import { validateForm, cleanFormData, handleEmptyResponse } from './filterValidate'
 
 export default {
   name: 'ShipmentFilter',
@@ -241,6 +242,7 @@ export default {
       },
       loading: false,
       error: null,
+      fieldErrors: {},
       shipments: [],
       filteredShipments: []
     }
@@ -313,13 +315,36 @@ export default {
             }
           `
         })
-        console.log('Shipments loaded:', data.filteredData)
-        this.shipments = data.filteredData
-        this.filteredShipments = data.filteredData
-        this.$emit('filter-applied', this.shipments)
+        console.log('Raw response:', data) // Debug log
+        
+        // Handle empty or invalid responses
+        if (!data?.filteredData) {
+          console.log('No data received')
+          this.shipments = []
+          this.filteredShipments = []
+          this.$emit('filter-applied', [])
+          return
+        }
+
+        // Filter out empty objects and ensure we have valid shipment data
+        const validShipments = data.filteredData.filter(item => 
+          item && 
+          typeof item === 'object' && 
+          Object.keys(item).length > 0 &&
+          item.id &&
+          item.__typename === 'ShipmentType'
+        )
+
+        console.log('Valid shipments:', validShipments) // Debug log
+        this.shipments = validShipments
+        this.filteredShipments = validShipments
+        this.$emit('filter-applied', validShipments)
       } catch (err) {
         this.error = 'خطا در بارگذاری بارنامه‌ها'
         console.error('Error loading shipments:', err)
+        this.shipments = []
+        this.filteredShipments = []
+        this.$emit('filter-applied', [])
       } finally {
         this.loading = false
       }
@@ -345,42 +370,55 @@ export default {
         invoiceStatus: '',
         paymentStatus: ''
       }
+      this.fieldErrors = {}
+      this.error = null
       this.filteredShipments = this.shipments
       this.$emit('filter-reset', this.shipments)
     },
     async applyFilters() {
       this.loading = true
       this.error = null
+      this.fieldErrors = {}
       
       try {
+        const { isValid, errors } = validateForm(this.filters, 'shipment')
+        
+        if (!isValid) {
+          this.fieldErrors = errors
+          this.error = 'لطفا خطاهای فرم را برطرف کنید'
+          return
+        }
+
+        const cleanFilters = cleanFormData(this.filters)
+        
         this.filteredShipments = this.shipments.filter(shipment => {
-          if (Object.keys(this.filters).every(key => !this.filters[key])) return true
+          if (Object.keys(cleanFilters).length === 0) return true
 
-          if (this.filters.shipmentStatus && shipment.status !== this.filters.shipmentStatus) return false
-          if (this.filters.shipmentType && shipment.shipmentType !== this.filters.shipmentType) return false
-          if (this.filters.shipmentLocation && !shipment.location.includes(this.filters.shipmentLocation)) return false
-          if (this.filters.licenseNumber && !shipment.licenseNumber.includes(this.filters.licenseNumber)) return false
-          if (this.filters.customerName && !shipment.customerName.includes(this.filters.customerName)) return false
-          if (this.filters.supplierName && !shipment.supplierName.includes(this.filters.supplierName)) return false
-          if (this.filters.materialType && !shipment.materialType.includes(this.filters.materialType)) return false
-          if (this.filters.materialName && !shipment.materialName.includes(this.filters.materialName)) return false
-          if (this.filters.invoiceStatus && shipment.invoiceStatus !== this.filters.invoiceStatus) return false
-          if (this.filters.paymentStatus && shipment.paymentStatus !== this.filters.paymentStatus) return false
+          if (cleanFilters.shipmentStatus && shipment.status !== cleanFilters.shipmentStatus) return false
+          if (cleanFilters.shipmentType && shipment.shipmentType !== cleanFilters.shipmentType) return false
+          if (cleanFilters.shipmentLocation && !shipment.location.includes(cleanFilters.shipmentLocation)) return false
+          if (cleanFilters.licenseNumber && !shipment.licenseNumber.includes(cleanFilters.licenseNumber)) return false
+          if (cleanFilters.customerName && !shipment.customerName.includes(cleanFilters.customerName)) return false
+          if (cleanFilters.supplierName && !shipment.supplierName.includes(cleanFilters.supplierName)) return false
+          if (cleanFilters.materialType && !shipment.materialType.includes(cleanFilters.materialType)) return false
+          if (cleanFilters.materialName && !shipment.materialName.includes(cleanFilters.materialName)) return false
+          if (cleanFilters.invoiceStatus && shipment.invoiceStatus !== cleanFilters.invoiceStatus) return false
+          if (cleanFilters.paymentStatus && shipment.paymentStatus !== cleanFilters.paymentStatus) return false
 
-          if (this.filters.weight1 && shipment.weight1 !== Number(this.filters.weight1)) return false
-          if (this.filters.weight2 && shipment.weight2 !== Number(this.filters.weight2)) return false
-          if (this.filters.netWeight && shipment.netWeight !== Number(this.filters.netWeight)) return false
-          if (this.filters.pricePerKg && shipment.pricePerKg !== Number(this.filters.pricePerKg)) return false
-          if (this.filters.totalPrice && shipment.totalPrice !== Number(this.filters.totalPrice)) return false
-          if (this.filters.extraCost && shipment.extraCost !== Number(this.filters.extraCost)) return false
+          if (cleanFilters.weight1 && shipment.weight1 !== Number(cleanFilters.weight1)) return false
+          if (cleanFilters.weight2 && shipment.weight2 !== Number(cleanFilters.weight2)) return false
+          if (cleanFilters.netWeight && shipment.netWeight !== Number(cleanFilters.netWeight)) return false
+          if (cleanFilters.pricePerKg && shipment.pricePerKg !== Number(cleanFilters.pricePerKg)) return false
+          if (cleanFilters.totalPrice && shipment.totalPrice !== Number(cleanFilters.totalPrice)) return false
+          if (cleanFilters.extraCost && shipment.extraCost !== Number(cleanFilters.extraCost)) return false
 
-          if (this.filters.startDate) {
-            const startDate = new Date(this.filters.startDate)
+          if (cleanFilters.startDate) {
+            const startDate = new Date(cleanFilters.startDate)
             const shipmentDate = new Date(shipment.date)
             if (shipmentDate < startDate) return false
           }
-          if (this.filters.endDate) {
-            const endDate = new Date(this.filters.endDate)
+          if (cleanFilters.endDate) {
+            const endDate = new Date(cleanFilters.endDate)
             const shipmentDate = new Date(shipment.date)
             if (shipmentDate > endDate) return false
           }
