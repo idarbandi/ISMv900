@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-2xl font-semibold mb-6">فیلتر ارسال</h2>
+    <h2 class="text-2xl font-semibold mb-6">فیلتر بارنامه</h2>
     
     <!-- Error Message -->
     <div v-if="error" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -11,7 +11,7 @@
     <div v-if="loading" class="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
       Loading...
     </div>
-
+    
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <!-- Date Range -->
       <div class="col-span-1">
@@ -48,7 +48,7 @@
         </select>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">نوع ارسال</label>
+        <label class="block text-sm font-medium text-gray-700">نوع بارنامه</label>
         <select 
           v-model="filters.shipmentType"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -116,23 +116,23 @@
       <!-- Weights -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">وزن اول</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.weight1"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
+          >
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">وزن دوم</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.weight2"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
+          >
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">وزن خالص</label>
-        <input 
+          <input 
           type="text" 
           v-model="filters.netWeight"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -142,28 +142,28 @@
       <!-- Prices -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">قیمت هر کیلو</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.pricePerKg"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
+          >
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">قیمت کل</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.totalPrice"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
+          >
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">هزینه اضافی</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.extraCost"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-      </div>
+          >
+        </div>
 
       <!-- Status -->
       <div class="col-span-1">

@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-2xl font-semibold mb-6">Product Filter</h2>
+    <h2 class="text-2xl font-semibold mb-6">فیلتر محصولات</h2>
     
     <!-- Error Message -->
     <div v-if="error" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -15,115 +15,150 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <!-- Date Range -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Start Date</label>
+        <label class="block text-sm font-medium text-gray-700">تاریخ شروع</label>
         <input 
           type="date" 
           v-model="filters.startDate"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.startDate ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.startDate" class="mt-1 text-sm text-red-600">{{ fieldErrors.startDate }}</p>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">End Date</label>
+        <label class="block text-sm font-medium text-gray-700">تاریخ پایان</label>
         <input 
           type="date" 
           v-model="filters.endDate"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.endDate ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.endDate" class="mt-1 text-sm text-red-600">{{ fieldErrors.endDate }}</p>
       </div>
 
       <!-- Basic Information -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Reel Number</label>
+        <label class="block text-sm font-medium text-gray-700">شماره رول</label>
         <input 
           type="text" 
           v-model="filters.productReelNumber"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.productReelNumber ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.productReelNumber" class="mt-1 text-sm text-red-600">{{ fieldErrors.productReelNumber }}</p>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Profile Name</label>
+        <label class="block text-sm font-medium text-gray-700">نام پروفایل</label>
         <input 
           type="text" 
           v-model="filters.productProfileName"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.productProfileName ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.productProfileName" class="mt-1 text-sm text-red-600">{{ fieldErrors.productProfileName }}</p>
       </div>
 
       <!-- Measurements -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Width (mm)</label>
+        <label class="block text-sm font-medium text-gray-700">عرض (میلی‌متر)</label>
         <input 
           type="number" 
           v-model="filters.productWidth"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.productWidth ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.productWidth" class="mt-1 text-sm text-red-600">{{ fieldErrors.productWidth }}</p>
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">GSM</label>
         <input 
           type="number" 
           v-model="filters.productGsm"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.productGsm ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.productGsm" class="mt-1 text-sm text-red-600">{{ fieldErrors.productGsm }}</p>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Length (m)</label>
+        <label class="block text-sm font-medium text-gray-700">طول (متر)</label>
         <input 
           type="number" 
           v-model="filters.productLength"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.productLength ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.productLength" class="mt-1 text-sm text-red-600">{{ fieldErrors.productLength }}</p>
       </div>
 
       <!-- Status and Location -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Status</label>
+        <label class="block text-sm font-medium text-gray-700">وضعیت</label>
         <select 
           v-model="filters.productStatus"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.productStatus ? 'border-red-500' : ''
+          ]"
         >
-          <option value="">All</option>
-          <option value="In-stock">In Stock</option>
-          <option value="Sold">Sold</option>
-          <option value="Moved">Moved</option>
-          <option value="Delivered">Delivered</option>
+          <option value="">همه</option>
+          <option value="In-stock">موجود</option>
+          <option value="Sold">فروخته شده</option>
+          <option value="Moved">انتقال یافته</option>
+          <option value="Delivered">تحویل داده شده</option>
         </select>
+        <p v-if="fieldErrors.productStatus" class="mt-1 text-sm text-red-600">{{ fieldErrors.productStatus }}</p>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Location</label>
+        <label class="block text-sm font-medium text-gray-700">موقعیت</label>
         <input 
           type="text" 
           v-model="filters.productLocation"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.productLocation ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.productLocation" class="mt-1 text-sm text-red-600">{{ fieldErrors.productLocation }}</p>
       </div>
 
       <!-- Grade and Breaks -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Grade</label>
+        <label class="block text-sm font-medium text-gray-700">گرید</label>
         <input 
           type="text" 
           v-model="filters.productGrade"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.productGrade ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.productGrade" class="mt-1 text-sm text-red-600">{{ fieldErrors.productGrade }}</p>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Breaks Range</label>
-        <div class="flex items-center space-x-4">
-          <input 
-            type="number" 
-            v-model="filters.minBreaks"
-            class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Min"
-          >
-          <span>to</span>
-          <input 
-            type="number" 
-            v-model="filters.maxBreaks"
-            class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Max"
-          >
-        </div>
+        <label class="block text-sm font-medium text-gray-700">شکستگی</label>
+        <input 
+          type="number" 
+          v-model="filters.productBreaks"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.productBreaks ? 'border-red-500' : ''
+          ]"
+          placeholder="تعداد شکستگی"
+        >
+        <p v-if="fieldErrors.productBreaks" class="mt-1 text-sm text-red-600">{{ fieldErrors.productBreaks }}</p>
       </div>
     </div>
 
@@ -134,20 +169,21 @@
         class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         :disabled="loading"
       >
-        Reset
+        پاک کردن
       </button>
       <button 
         @click="applyFilters"
         class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         :disabled="loading"
       >
-        {{ loading ? 'Loading...' : 'Apply Filters' }}
+        {{ loading ? 'در حال بارگذاری...' : 'اعمال فیلتر' }}
       </button>
     </div>
   </div>
 </template>
 
 <script>
+import { validateForm, cleanFormData } from './filterValidate'
 import { gql } from '@apollo/client/core'
 import { apolloClient } from '@/apollo'
 
@@ -166,15 +202,55 @@ export default {
         productStatus: '',
         productLocation: '',
         productProfileName: '',
-        minBreaks: 0,
-        maxBreaks: 10,
+        productBreaks: '',
       },
       loading: false,
       error: null,
-      products: []
+      fieldErrors: {},
+      products: [], // Store all products
+      filteredProducts: [] // Store filtered products
     }
   },
+  async created() {
+    // Load initial data when component is created
+    await this.loadProducts()
+  },
   methods: {
+    async loadProducts() {
+      this.loading = true
+      try {
+        const { data } = await apolloClient.query({
+          query: gql`
+            query GetAllProducts {
+              products {
+                id
+                reelNumber
+                width
+                gsm
+                length
+                grade
+                status
+                location
+                profileName
+                breaks
+                receiveDate
+                lastDate
+                comments
+                qrCode
+              }
+            }
+          `
+        })
+        this.products = data.products
+        this.filteredProducts = data.products // Initially show all products
+        this.$emit('products-loaded', this.products)
+      } catch (err) {
+        this.error = 'خطا در بارگذاری محصولات'
+        console.error('Error loading products:', err)
+      } finally {
+        this.loading = false
+      }
+    },
     resetFilters() {
       this.filters = {
         startDate: '',
@@ -187,32 +263,64 @@ export default {
         productStatus: '',
         productLocation: '',
         productProfileName: '',
-        minBreaks: 0,
-        maxBreaks: 10,
+        productBreaks: '',
       }
-      this.$emit('filter-reset')
+      this.fieldErrors = {}
+      this.error = null
+      this.filteredProducts = this.products // Reset to show all products
+      this.$emit('filter-reset', this.products)
     },
     async applyFilters() {
       this.loading = true
       this.error = null
+      this.fieldErrors = {}
       
       try {
-        const filterInput = {
-          startDate: this.filters.startDate || null,
-          endDate: this.filters.endDate || null,
-          productReelNumber: this.filters.productReelNumber || null,
-          productWidth: this.filters.productWidth ? parseInt(this.filters.productWidth) : null,
-          productGsm: this.filters.productGsm ? parseInt(this.filters.productGsm) : null,
-          productLength: this.filters.productLength ? parseInt(this.filters.productLength) : null,
-          productGrade: this.filters.productGrade || null,
-          productStatus: this.filters.productStatus || null,
-          productLocation: this.filters.productLocation || null,
-          productProfileName: this.filters.productProfileName || null,
-          minBreaks: this.filters.minBreaks || null,
-          maxBreaks: this.filters.maxBreaks || null
+        // Validate form
+        const { isValid, errors } = validateForm(this.filters, 'product')
+        
+        if (!isValid) {
+          this.fieldErrors = errors
+          this.error = 'لطفا خطاهای فرم را برطرف کنید'
+          return
         }
 
-        this.$emit('filter-applied', filterInput)
+        // Clean filter data
+        const cleanFilters = cleanFormData(this.filters)
+        
+        // Filter products based on criteria
+        this.filteredProducts = this.products.filter(product => {
+          // If no filters are applied, show all products
+          if (Object.keys(cleanFilters).length === 0) return true
+
+          // Apply each filter if it exists
+          if (cleanFilters.productReelNumber && !product.reelNumber.includes(cleanFilters.productReelNumber)) return false
+          if (cleanFilters.productWidth && product.width !== Number(cleanFilters.productWidth)) return false
+          if (cleanFilters.productGsm && product.gsm !== Number(cleanFilters.productGsm)) return false
+          if (cleanFilters.productLength && product.length !== Number(cleanFilters.productLength)) return false
+          if (cleanFilters.productGrade && product.grade !== cleanFilters.productGrade) return false
+          if (cleanFilters.productStatus && product.status !== cleanFilters.productStatus) return false
+          if (cleanFilters.productLocation && !product.location.includes(cleanFilters.productLocation)) return false
+          if (cleanFilters.productProfileName && !product.profileName.includes(cleanFilters.productProfileName)) return false
+          if (cleanFilters.productBreaks && product.breaks !== Number(cleanFilters.productBreaks)) return false
+
+          // Date range filtering
+          if (cleanFilters.startDate) {
+            const startDate = new Date(cleanFilters.startDate)
+            const productDate = new Date(product.receiveDate)
+            if (productDate < startDate) return false
+          }
+          if (cleanFilters.endDate) {
+            const endDate = new Date(cleanFilters.endDate)
+            const productDate = new Date(product.receiveDate)
+            if (productDate > endDate) return false
+          }
+
+          return true
+        })
+
+        // Emit filtered products
+        this.$emit('filter-applied', this.filteredProducts)
       } catch (err) {
         this.error = err.message
         console.error('Filter error:', err)
