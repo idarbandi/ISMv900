@@ -19,57 +19,61 @@
         <input 
           type="date" 
           v-model="filters.startDate"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.startDate ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-        <p v-if="fieldErrors.startDate" class="mt-1 text-sm text-red-600">{{ fieldErrors.startDate }}</p>
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">تاریخ پایان</label>
         <input 
           type="date" 
           v-model="filters.endDate"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.endDate ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-        <p v-if="fieldErrors.endDate" class="mt-1 text-sm text-red-600">{{ fieldErrors.endDate }}</p>
       </div>
 
-      <!-- Status and Payment -->
+      <!-- Status and Type -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">وضعیت</label>
         <select 
-          v-model="filters.status"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.status ? 'border-red-500' : ''
-          ]"
+          v-model="filters.shipmentStatus"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
           <option value="">همه</option>
-          <option value="Paid">پرداخت شده</option>
-          <option value="Terms">نسیه</option>
+          <option value="Registered">ثبت شده</option>
+          <option value="LoadingUnloading">در حال بارگیری/تخلیه</option>
+          <option value="LoadedUnloaded">بارگیری/تخلیه شده</option>
+          <option value="Office">دفتر</option>
+          <option value="Delivered">تحویل داده شده</option>
           <option value="Cancelled">لغو شده</option>
         </select>
-        <p v-if="fieldErrors.status" class="mt-1 text-sm text-red-600">{{ fieldErrors.status }}</p>
+      </div>
+
+      <!-- Location -->
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700">موقعیت</label>
+        <input 
+          type="text" 
+          v-model="filters.shipmentLocation"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+      </div>
+
+      <!-- Vehicle and Customer -->
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700">شماره پلاک</label>
+        <input 
+          type="text" 
+          v-model="filters.licenseNumber"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">وضعیت فاکتور</label>
-        <select 
-          v-model="filters.invoiceStatus"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.invoiceStatus ? 'border-red-500' : ''
-          ]"
+        <label class="block text-sm font-medium text-gray-700">نام مشتری</label>
+        <input 
+          type="text" 
+          v-model="filters.customerName"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-          <option value="">همه</option>
-          <option value="Received">دریافت شده</option>
-          <option value="NA">بدون فاکتور</option>
-        </select>
-        <p v-if="fieldErrors.invoiceStatus" class="mt-1 text-sm text-red-600">{{ fieldErrors.invoiceStatus }}</p>
       </div>
 
       <!-- Supplier and Material -->
@@ -78,112 +82,101 @@
         <input 
           type="text" 
           v-model="filters.supplierName"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.supplierName ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-        <p v-if="fieldErrors.supplierName" class="mt-1 text-sm text-red-600">{{ fieldErrors.supplierName }}</p>
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">نوع مواد</label>
         <input 
           type="text" 
           v-model="filters.materialType"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.materialType ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-        <p v-if="fieldErrors.materialType" class="mt-1 text-sm text-red-600">{{ fieldErrors.materialType }}</p>
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">نام مواد</label>
         <input 
           type="text" 
           v-model="filters.materialName"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.materialName ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-        <p v-if="fieldErrors.materialName" class="mt-1 text-sm text-red-600">{{ fieldErrors.materialName }}</p>
       </div>
 
-      <!-- Quantity and Weight -->
+      <!-- Weights -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Quantity Range</label>
-        <div class="flex items-center space-x-4">
+        <label class="block text-sm font-medium text-gray-700">وزن اول</label>
           <input 
             type="number" 
-            v-model="filters.minQuantity"
-            class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Min"
+          v-model="filters.weight1"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
-          <span>to</span>
-          <input 
-            type="number" 
-            v-model="filters.maxQuantity"
-            class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Max"
-          >
-        </div>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">Weight Range (kg)</label>
-        <div class="flex items-center space-x-4">
+        <label class="block text-sm font-medium text-gray-700">وزن دوم</label>
           <input 
             type="number" 
-            v-model="filters.minWeight"
-            class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Min"
+          v-model="filters.weight2"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
-          <span>to</span>
+      </div>
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700">وزن خالص</label>
           <input 
-            type="number" 
-            v-model="filters.maxWeight"
-            class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Max"
-          >
-        </div>
+          type="text" 
+          v-model="filters.netWeight"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
       </div>
 
-      <!-- Price Range -->
+      <!-- Prices -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">قیمت هر کیلو</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.pricePerKg"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.pricePerKg ? 'border-red-500' : ''
-          ]"
-        >
-        <p v-if="fieldErrors.pricePerKg" class="mt-1 text-sm text-red-600">{{ fieldErrors.pricePerKg }}</p>
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">قیمت کل</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.totalPrice"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.totalPrice ? 'border-red-500' : ''
-          ]"
-        >
-        <p v-if="fieldErrors.totalPrice" class="mt-1 text-sm text-red-600">{{ fieldErrors.totalPrice }}</p>
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">هزینه اضافی</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.extraCost"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.extraCost ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+        </div>
+
+      <!-- Status -->
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700">وضعیت فاکتور</label>
+        <select 
+          v-model="filters.invoiceStatus"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-        <p v-if="fieldErrors.extraCost" class="mt-1 text-sm text-red-600">{{ fieldErrors.extraCost }}</p>
+          <option value="">همه</option>
+          <option value="NA">بدون فاکتور</option>
+          <option value="Sent">ارسال شده</option>
+          <option value="Received">دریافت شده</option>
+        </select>
+      </div>
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700">وضعیت پرداخت</label>
+        <select 
+          v-model="filters.paymentStatus"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+          <option value="">همه</option>
+          <option value="Terms">نسیه</option>
+          <option value="Paid">پرداخت شده</option>
+        </select>
       </div>
     </div>
 
@@ -201,14 +194,16 @@
         class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         :disabled="loading"
       >
-        {{ loading ? 'در حال بارگذاری...' : 'اعمال فیلتر' }}
+        {{ loading ? 'Loading...' : 'اعمال فیلتر' }}
       </button>
     </div>
   </div>
 </template>
 
 <script>
-import { validateForm, cleanFormData } from './filterValidate'
+import { gql } from '@apollo/client/core'
+import { apolloClient } from '@/apollo'
+import { validateForm, cleanFormData, handleEmptyResponse } from './filterValidate'
 
 export default {
   name: 'PurchaseFilter',
@@ -217,45 +212,140 @@ export default {
       filters: {
         startDate: '',
         endDate: '',
-        status: '',
-        invoiceStatus: '',
+        shipmentStatus: '',
+        shipmentType: '',
+        shipmentLocation: '',
+        licenseNumber: '',
+        customerName: '',
         supplierName: '',
         materialType: '',
         materialName: '',
-        minQuantity: '',
-        maxQuantity: '',
-        minWeight: '',
-        maxWeight: '',
+        weight1: '',
+        weight2: '',
+        netWeight: '',
         pricePerKg: '',
         totalPrice: '',
-        extraCost: ''
+        extraCost: '',
+        invoiceStatus: '',
+        paymentStatus: ''
       },
       loading: false,
       error: null,
-      fieldErrors: {}
+      fieldErrors: {},
+      purchases: [],
+      filteredPurchases: []
     }
   },
+  async created() {
+    // Load initial data when component is created
+    await this.loadPurchases()
+  },
   methods: {
+    async loadPurchases() {
+      this.loading = true
+      try {
+        const { data } = await apolloClient.query({
+          query: gql`
+            query FilterPurchaseData($filterInput: FilterInput) {
+              filteredData(filterInput: $filterInput) {
+                ... on ShipmentType {
+                  id
+                  date
+                  status
+                  location
+                  supplierName
+                  materialType
+                  materialName
+                  pricePerKg
+                  totalPrice
+                  vat
+                  extraCost
+                  paymentStatus
+                  documentInfo
+                  comments
+                  username
+                  logs
+                }
+              }
+            }
+          `,
+          variables: {
+            filterInput: {
+              shipmentType: "Incoming",
+              shipmentStatus: null,
+              shipmentLocation: null,
+              licenseNumber: null,
+              customerName: null,
+              supplierName: null,
+              materialType: null,
+              materialName: null,
+              invoiceStatus: null,
+              paymentStatus: null,
+              startDate: null,
+              endDate: null
+            }
+          }
+        })
+        console.log('Raw response:', data) // Debug log
+        
+        // Handle empty or invalid responses
+        if (!data?.filteredData) {
+          console.log('No data received')
+          this.purchases = []
+          this.filteredPurchases = []
+          this.$emit('filter-applied', [])
+          return
+        }
+
+        // Filter out empty objects and ensure we have valid purchase data
+        const validPurchases = data.filteredData.filter(item => 
+          item && 
+          typeof item === 'object' && 
+          Object.keys(item).length > 0 &&
+          item.id &&
+          item.__typename === 'ShipmentType' &&
+          item.shipmentType === 'Incoming'
+        )
+
+        console.log('Valid purchases:', validPurchases) // Debug log
+        this.purchases = validPurchases
+        this.filteredPurchases = validPurchases
+        this.$emit('filter-applied', validPurchases)
+      } catch (err) {
+        this.error = 'خطا در بارگذاری خریدها'
+        console.error('Error loading purchases:', err)
+        this.purchases = []
+        this.filteredPurchases = []
+        this.$emit('filter-applied', [])
+      } finally {
+        this.loading = false
+      }
+    },
     resetFilters() {
       this.filters = {
         startDate: '',
         endDate: '',
-        status: '',
-        invoiceStatus: '',
+        shipmentStatus: '',
+        shipmentType: '',
+        shipmentLocation: '',
+        licenseNumber: '',
+        customerName: '',
         supplierName: '',
         materialType: '',
         materialName: '',
-        minQuantity: '',
-        maxQuantity: '',
-        minWeight: '',
-        maxWeight: '',
+        weight1: '',
+        weight2: '',
+        netWeight: '',
         pricePerKg: '',
         totalPrice: '',
-        extraCost: ''
+        extraCost: '',
+        invoiceStatus: '',
+        paymentStatus: ''
       }
       this.fieldErrors = {}
       this.error = null
-      this.$emit('filter-reset')
+      this.filteredPurchases = this.purchases
+      this.$emit('filter-reset', this.purchases)
     },
     async applyFilters() {
       this.loading = true
@@ -263,18 +353,7 @@ export default {
       this.fieldErrors = {}
       
       try {
-        // Convert numeric strings to numbers before validation
-        const numericFields = ['minQuantity', 'maxQuantity', 'minWeight', 'maxWeight', 'pricePerKg', 'totalPrice', 'extraCost']
-        const processedFilters = { ...this.filters }
-        
-        numericFields.forEach(field => {
-          if (processedFilters[field] !== '') {
-            processedFilters[field] = Number(processedFilters[field])
-          }
-        })
-
-        // Validate form
-        const { isValid, errors } = validateForm(processedFilters, 'purchase')
+        const { isValid, errors } = validateForm(this.filters, 'shipment')
         
         if (!isValid) {
           this.fieldErrors = errors
@@ -282,9 +361,63 @@ export default {
           return
         }
 
-        // Clean and emit filter data
-        const cleanFilters = cleanFormData(processedFilters)
-        this.$emit('filter-applied', cleanFilters)
+        const cleanFilters = cleanFormData(this.filters)
+        
+        // Add shipmentType to filter for purchases
+        const filterInput = {
+          ...cleanFilters,
+          shipmentType: "Incoming"
+        }
+
+        const { data } = await apolloClient.query({
+          query: gql`
+            query FilterPurchaseData($filterInput: FilterInput) {
+              filteredData(filterInput: $filterInput) {
+                ... on ShipmentType {
+                  id
+                  date
+                  status
+                  location
+                  supplierName
+                  materialType
+                  materialName
+                  pricePerKg
+                  totalPrice
+                  vat
+                  extraCost
+                  paymentStatus
+                  documentInfo
+                  comments
+                  username
+                  logs
+                }
+              }
+            }
+          `,
+          variables: {
+            filterInput
+          }
+        })
+
+        if (!data?.filteredData) {
+          console.log('No data received')
+          this.filteredPurchases = []
+          this.$emit('filter-applied', [])
+          return
+        }
+
+        // Filter out empty objects and ensure we have valid purchase data
+        const validPurchases = data.filteredData.filter(item => 
+          item && 
+          typeof item === 'object' && 
+          Object.keys(item).length > 0 &&
+          item.id &&
+          item.__typename === 'ShipmentType' &&
+          item.shipmentType === 'Incoming'
+        )
+
+        this.filteredPurchases = validPurchases
+        this.$emit('filter-applied', validPurchases)
       } catch (err) {
         this.error = err.message
         console.error('Filter error:', err)

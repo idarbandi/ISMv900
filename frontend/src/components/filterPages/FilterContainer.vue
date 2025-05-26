@@ -461,10 +461,25 @@ export default {
       this.hasSearched = true
 
       try {
+        const filterInput = {
+          shipmentType: "Incoming",
+          shipmentStatus: filters.shipmentStatus || null,
+          shipmentLocation: filters.shipmentLocation || null,
+          licenseNumber: filters.licenseNumber || null,
+          customerName: filters.customerName || null,
+          supplierName: filters.supplierName || null,
+          materialType: filters.materialType || null,
+          materialName: filters.materialName || null,
+          invoiceStatus: filters.invoiceStatus || null,
+          paymentStatus: filters.paymentStatus || null,
+          startDate: filters.startDate || null,
+          endDate: filters.endDate || null
+        }
+
         const response = await apolloClient.query({
           query: PURCHASE_FILTER_QUERY,
           variables: {
-            filterInput: filters
+            filterInput
           },
           fetchPolicy: 'network-only'
         })
