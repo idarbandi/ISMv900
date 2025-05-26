@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-2xl font-semibold mb-6">فیلتر ارسال</h2>
+    <h2 class="text-2xl font-semibold mb-6">فیلتر بارنامه</h2>
     
     <!-- Error Message -->
     <div v-if="error" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -11,7 +11,7 @@
     <div v-if="loading" class="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
       Loading...
     </div>
-
+    
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <!-- Date Range -->
       <div class="col-span-1">
@@ -48,7 +48,7 @@
         </select>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">نوع ارسال</label>
+        <label class="block text-sm font-medium text-gray-700">نوع بارنامه</label>
         <select 
           v-model="filters.shipmentType"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -116,23 +116,23 @@
       <!-- Weights -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">وزن اول</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.weight1"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
+          >
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">وزن دوم</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.weight2"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
+          >
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">وزن خالص</label>
-        <input 
+          <input 
           type="text" 
           v-model="filters.netWeight"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -142,28 +142,28 @@
       <!-- Prices -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">قیمت هر کیلو</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.pricePerKg"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
+          >
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">قیمت کل</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.totalPrice"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
+          >
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">هزینه اضافی</label>
-        <input 
-          type="number" 
+          <input 
+            type="number" 
           v-model="filters.extraCost"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-      </div>
+          >
+        </div>
 
       <!-- Status -->
       <div class="col-span-1">
@@ -214,6 +214,7 @@
 <script>
 import { gql } from '@apollo/client/core'
 import { apolloClient } from '@/apollo'
+import { validateForm, cleanFormData, handleEmptyResponse } from './filterValidate'
 
 export default {
   name: 'ShipmentFilter',
@@ -241,10 +242,113 @@ export default {
       },
       loading: false,
       error: null,
-      shipments: []
+      fieldErrors: {},
+      shipments: [],
+      filteredShipments: []
     }
   },
+  async created() {
+    await this.loadShipments()
+  },
   methods: {
+    async loadShipments() {
+      this.loading = true
+      try {
+        const { data } = await apolloClient.query({
+          query: gql`
+            query GetAllShipments {
+              filteredData(filterInput: { 
+                shipmentStatus: null,
+                shipmentType: null,
+                shipmentLocation: null,
+                licenseNumber: null,
+                customerName: null,
+                supplierName: null,
+                materialType: null,
+                materialName: null,
+                invoiceStatus: null,
+                paymentStatus: null,
+                startDate: null,
+                endDate: null
+              }) {
+                ... on ShipmentType {
+                  id
+                  date
+                  status
+                  location
+                  receiveDate
+                  entryTime
+                  weight1Time
+                  weight2Time
+                  exitTime
+                  shipmentType
+                  licenseNumber
+                  customerName
+                  supplierName
+                  weight1
+                  unloadLocation
+                  unit
+                  quantity
+                  quality
+                  penalty
+                  weight2
+                  netWeight
+                  listOfReels
+                  profileName
+                  width
+                  salesId
+                  pricePerKg
+                  totalPrice
+                  extraCost
+                  materialType
+                  materialName
+                  vat
+                  invoiceStatus
+                  paymentStatus
+                  documentInfo
+                  comments
+                  cancellationReason
+                  username
+                  logs
+                }
+              }
+            }
+          `
+        })
+        console.log('Raw response:', data) // Debug log
+        
+        // Handle empty or invalid responses
+        if (!data?.filteredData) {
+          console.log('No data received')
+          this.shipments = []
+          this.filteredShipments = []
+          this.$emit('filter-applied', [])
+          return
+        }
+
+        // Filter out empty objects and ensure we have valid shipment data
+        const validShipments = data.filteredData.filter(item => 
+          item && 
+          typeof item === 'object' && 
+          Object.keys(item).length > 0 &&
+          item.id &&
+          item.__typename === 'ShipmentType'
+        )
+
+        console.log('Valid shipments:', validShipments) // Debug log
+        this.shipments = validShipments
+        this.filteredShipments = validShipments
+        this.$emit('filter-applied', validShipments)
+      } catch (err) {
+        this.error = 'خطا در بارگذاری بارنامه‌ها'
+        console.error('Error loading shipments:', err)
+        this.shipments = []
+        this.filteredShipments = []
+        this.$emit('filter-applied', [])
+      } finally {
+        this.loading = false
+      }
+    },
     resetFilters() {
       this.filters = {
         startDate: '',
@@ -266,35 +370,63 @@ export default {
         invoiceStatus: '',
         paymentStatus: ''
       }
-      this.$emit('filter-reset')
+      this.fieldErrors = {}
+      this.error = null
+      this.filteredShipments = this.shipments
+      this.$emit('filter-reset', this.shipments)
     },
     async applyFilters() {
       this.loading = true
       this.error = null
+      this.fieldErrors = {}
       
       try {
-        const filterInput = {
-          startDate: this.filters.startDate || null,
-          endDate: this.filters.endDate || null,
-          shipmentStatus: this.filters.shipmentStatus || null,
-          shipmentType: this.filters.shipmentType || null,
-          shipmentLocation: this.filters.shipmentLocation || null,
-          licenseNumber: this.filters.licenseNumber || null,
-          customerName: this.filters.customerName || null,
-          supplierName: this.filters.supplierName || null,
-          materialType: this.filters.materialType || null,
-          materialName: this.filters.materialName || null,
-          weight1: this.filters.weight1 ? parseInt(this.filters.weight1) : null,
-          weight2: this.filters.weight2 ? parseInt(this.filters.weight2) : null,
-          netWeight: this.filters.netWeight || null,
-          pricePerKg: this.filters.pricePerKg ? parseInt(this.filters.pricePerKg) : null,
-          totalPrice: this.filters.totalPrice ? parseInt(this.filters.totalPrice) : null,
-          extraCost: this.filters.extraCost ? parseInt(this.filters.extraCost) : null,
-          invoiceStatus: this.filters.invoiceStatus || null,
-          paymentStatus: this.filters.paymentStatus || null
+        const { isValid, errors } = validateForm(this.filters, 'shipment')
+        
+        if (!isValid) {
+          this.fieldErrors = errors
+          this.error = 'لطفا خطاهای فرم را برطرف کنید'
+          return
         }
 
-        this.$emit('filter-applied', filterInput)
+        const cleanFilters = cleanFormData(this.filters)
+        
+        this.filteredShipments = this.shipments.filter(shipment => {
+          if (Object.keys(cleanFilters).length === 0) return true
+
+          if (cleanFilters.shipmentStatus && shipment.status !== cleanFilters.shipmentStatus) return false
+          if (cleanFilters.shipmentType && shipment.shipmentType !== cleanFilters.shipmentType) return false
+          if (cleanFilters.shipmentLocation && !shipment.location.includes(cleanFilters.shipmentLocation)) return false
+          if (cleanFilters.licenseNumber && !shipment.licenseNumber.includes(cleanFilters.licenseNumber)) return false
+          if (cleanFilters.customerName && !shipment.customerName.includes(cleanFilters.customerName)) return false
+          if (cleanFilters.supplierName && !shipment.supplierName.includes(cleanFilters.supplierName)) return false
+          if (cleanFilters.materialType && !shipment.materialType.includes(cleanFilters.materialType)) return false
+          if (cleanFilters.materialName && !shipment.materialName.includes(cleanFilters.materialName)) return false
+          if (cleanFilters.invoiceStatus && shipment.invoiceStatus !== cleanFilters.invoiceStatus) return false
+          if (cleanFilters.paymentStatus && shipment.paymentStatus !== cleanFilters.paymentStatus) return false
+
+          if (cleanFilters.weight1 && shipment.weight1 !== Number(cleanFilters.weight1)) return false
+          if (cleanFilters.weight2 && shipment.weight2 !== Number(cleanFilters.weight2)) return false
+          if (cleanFilters.netWeight && shipment.netWeight !== Number(cleanFilters.netWeight)) return false
+          if (cleanFilters.pricePerKg && shipment.pricePerKg !== Number(cleanFilters.pricePerKg)) return false
+          if (cleanFilters.totalPrice && shipment.totalPrice !== Number(cleanFilters.totalPrice)) return false
+          if (cleanFilters.extraCost && shipment.extraCost !== Number(cleanFilters.extraCost)) return false
+
+          if (cleanFilters.startDate) {
+            const startDate = new Date(cleanFilters.startDate)
+            const shipmentDate = new Date(shipment.date)
+            if (shipmentDate < startDate) return false
+          }
+          if (cleanFilters.endDate) {
+            const endDate = new Date(cleanFilters.endDate)
+            const shipmentDate = new Date(shipment.date)
+            if (shipmentDate > endDate) return false
+          }
+
+          return true
+        })
+
+        this.$emit('filter-applied', this.filteredShipments)
       } catch (err) {
         this.error = err.message
         console.error('Filter error:', err)
