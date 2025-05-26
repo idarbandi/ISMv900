@@ -241,10 +241,89 @@ export default {
       },
       loading: false,
       error: null,
-      shipments: []
+      shipments: [],
+      filteredShipments: []
     }
   },
+  async created() {
+    await this.loadShipments()
+  },
   methods: {
+    async loadShipments() {
+      this.loading = true
+      try {
+        const { data } = await apolloClient.query({
+          query: gql`
+            query GetAllShipments {
+              filteredData(filterInput: { 
+                shipmentStatus: null,
+                shipmentType: null,
+                shipmentLocation: null,
+                licenseNumber: null,
+                customerName: null,
+                supplierName: null,
+                materialType: null,
+                materialName: null,
+                invoiceStatus: null,
+                paymentStatus: null,
+                startDate: null,
+                endDate: null
+              }) {
+                ... on ShipmentType {
+                  id
+                  date
+                  status
+                  location
+                  receiveDate
+                  entryTime
+                  weight1Time
+                  weight2Time
+                  exitTime
+                  shipmentType
+                  licenseNumber
+                  customerName
+                  supplierName
+                  weight1
+                  unloadLocation
+                  unit
+                  quantity
+                  quality
+                  penalty
+                  weight2
+                  netWeight
+                  listOfReels
+                  profileName
+                  width
+                  salesId
+                  pricePerKg
+                  totalPrice
+                  extraCost
+                  materialType
+                  materialName
+                  vat
+                  invoiceStatus
+                  paymentStatus
+                  documentInfo
+                  comments
+                  cancellationReason
+                  username
+                  logs
+                }
+              }
+            }
+          `
+        })
+        console.log('Shipments loaded:', data.filteredData)
+        this.shipments = data.filteredData
+        this.filteredShipments = data.filteredData
+        this.$emit('filter-applied', this.shipments)
+      } catch (err) {
+        this.error = 'خطا در بارگذاری بارنامه‌ها'
+        console.error('Error loading shipments:', err)
+      } finally {
+        this.loading = false
+      }
+    },
     resetFilters() {
       this.filters = {
         startDate: '',
@@ -266,35 +345,50 @@ export default {
         invoiceStatus: '',
         paymentStatus: ''
       }
-      this.$emit('filter-reset')
+      this.filteredShipments = this.shipments
+      this.$emit('filter-reset', this.shipments)
     },
     async applyFilters() {
       this.loading = true
       this.error = null
       
       try {
-        const filterInput = {
-          startDate: this.filters.startDate || null,
-          endDate: this.filters.endDate || null,
-          shipmentStatus: this.filters.shipmentStatus || null,
-          shipmentType: this.filters.shipmentType || null,
-          shipmentLocation: this.filters.shipmentLocation || null,
-          licenseNumber: this.filters.licenseNumber || null,
-          customerName: this.filters.customerName || null,
-          supplierName: this.filters.supplierName || null,
-          materialType: this.filters.materialType || null,
-          materialName: this.filters.materialName || null,
-          weight1: this.filters.weight1 ? parseInt(this.filters.weight1) : null,
-          weight2: this.filters.weight2 ? parseInt(this.filters.weight2) : null,
-          netWeight: this.filters.netWeight || null,
-          pricePerKg: this.filters.pricePerKg ? parseInt(this.filters.pricePerKg) : null,
-          totalPrice: this.filters.totalPrice ? parseInt(this.filters.totalPrice) : null,
-          extraCost: this.filters.extraCost ? parseInt(this.filters.extraCost) : null,
-          invoiceStatus: this.filters.invoiceStatus || null,
-          paymentStatus: this.filters.paymentStatus || null
-        }
+        this.filteredShipments = this.shipments.filter(shipment => {
+          if (Object.keys(this.filters).every(key => !this.filters[key])) return true
 
-        this.$emit('filter-applied', filterInput)
+          if (this.filters.shipmentStatus && shipment.status !== this.filters.shipmentStatus) return false
+          if (this.filters.shipmentType && shipment.shipmentType !== this.filters.shipmentType) return false
+          if (this.filters.shipmentLocation && !shipment.location.includes(this.filters.shipmentLocation)) return false
+          if (this.filters.licenseNumber && !shipment.licenseNumber.includes(this.filters.licenseNumber)) return false
+          if (this.filters.customerName && !shipment.customerName.includes(this.filters.customerName)) return false
+          if (this.filters.supplierName && !shipment.supplierName.includes(this.filters.supplierName)) return false
+          if (this.filters.materialType && !shipment.materialType.includes(this.filters.materialType)) return false
+          if (this.filters.materialName && !shipment.materialName.includes(this.filters.materialName)) return false
+          if (this.filters.invoiceStatus && shipment.invoiceStatus !== this.filters.invoiceStatus) return false
+          if (this.filters.paymentStatus && shipment.paymentStatus !== this.filters.paymentStatus) return false
+
+          if (this.filters.weight1 && shipment.weight1 !== Number(this.filters.weight1)) return false
+          if (this.filters.weight2 && shipment.weight2 !== Number(this.filters.weight2)) return false
+          if (this.filters.netWeight && shipment.netWeight !== Number(this.filters.netWeight)) return false
+          if (this.filters.pricePerKg && shipment.pricePerKg !== Number(this.filters.pricePerKg)) return false
+          if (this.filters.totalPrice && shipment.totalPrice !== Number(this.filters.totalPrice)) return false
+          if (this.filters.extraCost && shipment.extraCost !== Number(this.filters.extraCost)) return false
+
+          if (this.filters.startDate) {
+            const startDate = new Date(this.filters.startDate)
+            const shipmentDate = new Date(shipment.date)
+            if (shipmentDate < startDate) return false
+          }
+          if (this.filters.endDate) {
+            const endDate = new Date(this.filters.endDate)
+            const shipmentDate = new Date(shipment.date)
+            if (shipmentDate > endDate) return false
+          }
+
+          return true
+        })
+
+        this.$emit('filter-applied', this.filteredShipments)
       } catch (err) {
         this.error = err.message
         console.error('Filter error:', err)

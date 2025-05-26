@@ -442,27 +442,11 @@ export default {
       this.hasSearched = true
 
       try {
-        const response = await apolloClient.query({
-          query: SHIPMENT_FILTER_QUERY,
-          variables: {
-            filterInput: filters
-          },
-          fetchPolicy: 'network-only'
-        })
-
-        if (response?.data?.filteredData && 
-            Array.isArray(response.data.filteredData) && 
-            response.data.filteredData.length > 0) {
-          this.shipmentData = response.data.filteredData.filter(item => 
-            item && 
-            typeof item === 'object' && 
-            Object.keys(item).length > 0 &&
-            item.id &&
-            item.__typename === 'ShipmentType'
-          )
-        } else {
-          this.shipmentData = []
-        }
+        console.log('Received filters:', filters) // Debug log
+        // Since we're getting the filtered shipments directly from ShipmentFilter
+        // we don't need to make another API call
+        this.shipmentData = Array.isArray(filters) ? filters : []
+        console.log('Updated shipmentData:', this.shipmentData) // Debug log
       } catch (err) {
         this.error = 'خطا در دریافت اطلاعات'
         console.error('Filter error:', err)
