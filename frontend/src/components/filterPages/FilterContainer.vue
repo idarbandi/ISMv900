@@ -159,6 +159,7 @@ import ShipmentFilter from './ShipmentFilter.vue'
 import PurchaseFilter from './PurchaseFilter.vue'
 import { gql } from '@apollo/client/core'
 import { apolloClient } from '@/apollo'
+import { translate, translateHeader } from '@/config/translations'
 
 const PRODUCT_FILTER_QUERY = gql`
   query FilterProductData($filterInput: FilterInput) {
@@ -360,19 +361,19 @@ export default {
     getShipmentTableFields(item) {
       return [
         item.date,
-        item.status,
-        item.location,
+        translate('status', item.status),
+        translate('location', item.location),
         item.receiveDate,
         item.entryTime,
         item.weight1Time,
         item.weight2Time,
         item.exitTime,
-        item.shipmentType,
+        translate('shipmentType', item.shipmentType),
         item.licenseNumber,
         item.customerName,
         item.supplierName,
         item.weight1,
-        item.unloadLocation,
+        translate('location', item.unloadLocation),
         item.unit,
         item.quantity,
         item.quality,
@@ -389,8 +390,8 @@ export default {
         item.materialType,
         item.materialName,
         item.vat,
-        item.invoiceStatus,
-        item.paymentStatus,
+        translate('invoiceStatus', item.invoiceStatus),
+        translate('paymentStatus', item.paymentStatus),
         item.documentInfo,
         item.comments,
         item.cancellationReason,

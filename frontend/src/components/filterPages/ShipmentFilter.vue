@@ -38,13 +38,7 @@
           v-model="filters.shipmentStatus"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-          <option value="">همه</option>
-          <option value="Registered">ثبت شده</option>
-          <option value="LoadingUnloading">در حال بارگیری/تخلیه</option>
-          <option value="LoadedUnloaded">بارگیری/تخلیه شده</option>
-          <option value="Office">دفتر</option>
-          <option value="Delivered">تحویل داده شده</option>
-          <option value="Cancelled">لغو شده</option>
+          <option v-for="option in statusOptions" :value="option.value" :key="option.value">{{ option.label }}</option>
         </select>
       </div>
       <div class="col-span-1">
@@ -53,9 +47,7 @@
           v-model="filters.shipmentType"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-          <option value="">همه</option>
-          <option value="Incoming">ورودی</option>
-          <option value="Outgoing">خروجی</option>
+          <option v-for="option in shipmentTypeOptions" :value="option.value" :key="option.value">{{ option.label }}</option>
         </select>
       </div>
 
@@ -172,10 +164,7 @@
           v-model="filters.invoiceStatus"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-          <option value="">همه</option>
-          <option value="NA">بدون فاکتور</option>
-          <option value="Sent">ارسال شده</option>
-          <option value="Received">دریافت شده</option>
+          <option v-for="option in invoiceStatusOptions" :value="option.value" :key="option.value">{{ option.label }}</option>
         </select>
       </div>
       <div class="col-span-1">
@@ -184,9 +173,7 @@
           v-model="filters.paymentStatus"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-          <option value="">همه</option>
-          <option value="Terms">نسیه</option>
-          <option value="Paid">پرداخت شده</option>
+          <option v-for="option in paymentStatusOptions" :value="option.value" :key="option.value">{{ option.label }}</option>
         </select>
       </div>
     </div>
@@ -215,6 +202,7 @@
 import { gql } from '@apollo/client/core'
 import { apolloClient } from '@/apollo'
 import { validateForm, cleanFormData, handleEmptyResponse } from './filterValidate'
+import { translate, getTranslationOptions } from '@/config/translations'
 
 export default {
   name: 'ShipmentFilter',
@@ -226,6 +214,7 @@ export default {
         shipmentStatus: '',
         shipmentType: '',
         shipmentLocation: '',
+        unloadLocation: '',
         licenseNumber: '',
         customerName: '',
         supplierName: '',
@@ -240,6 +229,12 @@ export default {
         invoiceStatus: '',
         paymentStatus: ''
       },
+      statusOptions: getTranslationOptions('status'),
+      shipmentTypeOptions: getTranslationOptions('shipmentType'),
+      invoiceStatusOptions: getTranslationOptions('invoiceStatus'),
+      paymentStatusOptions: getTranslationOptions('paymentStatus'),
+      locationOptions: getTranslationOptions('location'),
+      unloadLocationOptions: getTranslationOptions('unloadLocation'),
       loading: false,
       error: null,
       fieldErrors: {},
@@ -356,6 +351,7 @@ export default {
         shipmentStatus: '',
         shipmentType: '',
         shipmentLocation: '',
+        unloadLocation: '',
         licenseNumber: '',
         customerName: '',
         supplierName: '',
@@ -397,6 +393,7 @@ export default {
           if (cleanFilters.shipmentStatus && shipment.status !== cleanFilters.shipmentStatus) return false
           if (cleanFilters.shipmentType && shipment.shipmentType !== cleanFilters.shipmentType) return false
           if (cleanFilters.shipmentLocation && !shipment.location.includes(cleanFilters.shipmentLocation)) return false
+          if (cleanFilters.unloadLocation && shipment.unloadLocation !== cleanFilters.unloadLocation) return false
           if (cleanFilters.licenseNumber && !shipment.licenseNumber.includes(cleanFilters.licenseNumber)) return false
           if (cleanFilters.customerName && !shipment.customerName.includes(cleanFilters.customerName)) return false
           if (cleanFilters.supplierName && !shipment.supplierName.includes(cleanFilters.supplierName)) return false

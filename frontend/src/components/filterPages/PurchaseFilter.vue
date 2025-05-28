@@ -204,6 +204,7 @@
 import { gql } from '@apollo/client/core'
 import { apolloClient } from '@/apollo'
 import { validateForm, cleanFormData, handleEmptyResponse } from './filterValidate'
+import { getTranslationOptions } from '@/config/translations'
 
 export default {
   name: 'PurchaseFilter',
@@ -229,6 +230,9 @@ export default {
         invoiceStatus: '',
         paymentStatus: ''
       },
+      statusOptions: getTranslationOptions('status'),
+      invoiceStatusOptions: getTranslationOptions('invoiceStatus'),
+      paymentStatusOptions: getTranslationOptions('paymentStatus'),
       loading: false,
       error: null,
       fieldErrors: {},
