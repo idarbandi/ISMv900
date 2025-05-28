@@ -36,20 +36,22 @@ export const translations = {
   // Location translations
   location: {
     'DELIVERED': 'تحویل داده شده',
-    'ANBAR_MUHVATEH_KARDAN': 'انبار محوطه کردن',
+    'ANBAR_MUHVATEH_KARDAN': 'انبار محوطه کردان',
     'ANBAR_AKHAL': 'انبار آخال',
     'ANBAR_KHAMIR_GHADIM': 'انبار خمیر قدیم',
-    'ANBAR_KHAMIR_KORDAN': 'انبار خمیر کردن',
+    'ANBAR_KHAMIR_KORDAN': 'انبار خمیر کردان',
+    "Anbar_Sangin": "انبار سنگین",
     'ANBAR_KOOCHAK': 'انبار کوچک',
     'ANBAR_PARVANDEH': 'انبار پرونده'
   },
 
   // Unload location translations
   unloadLocation: {
-    'ANBAR_MUHVATEH_KARDAN': 'انبار محوطه کردن',
+    'ANBAR_MUHVATEH_KARDAN': 'انبار محوطه کردان',
     'ANBAR_AKHAL': 'انبار آخال',
     'ANBAR_KHAMIR_GHADIM': 'انبار خمیر قدیم',
-    'ANBAR_KHAMIR_KORDAN': 'انبار خمیر کردن',
+    'ANBAR_KHAMIR_KORDAN': 'انبار خمیر کردان',
+    "Anbar_Sangin": "انبار سنگین",
     'ANBAR_KOOCHAK': 'انبار کوچک',
     'ANBAR_PARVANDEH': 'انبار پرونده',
     'FACTORY': 'کارخانه',

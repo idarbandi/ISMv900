@@ -39,12 +39,12 @@
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
           <option value="">همه</option>
-          <option value="Registered">ثبت شده</option>
-          <option value="LoadingUnloading">در حال بارگیری/تخلیه</option>
-          <option value="LoadedUnloaded">بارگیری/تخلیه شده</option>
-          <option value="Office">دفتر</option>
-          <option value="Delivered">تحویل داده شده</option>
-          <option value="Cancelled">لغو شده</option>
+          <option value="REGISTERED">ثبت شده</option>
+          <option value="LOADING_UNLOADING">در حال بارگیری/تخلیه</option>
+          <option value="LOADED_UNLOADED">بارگیری/تخلیه شده</option>
+          <option value="OFFICE">دفتر</option>
+          <option value="DELIVERED">تحویل داده شده</option>
+          <option value="CANCELLED">لغو شده</option>
         </select>
       </div>
 
@@ -56,6 +56,19 @@
           v-model="filters.shipmentLocation"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
+      </div>
+
+      <!-- Unload Location -->
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700">محل تخلیه</label>
+        <select 
+          v-model="filters.unloadLocation"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+          <option v-for="option in unloadLocationOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
       </div>
 
       <!-- Vehicle and Customer -->
@@ -163,8 +176,8 @@
         >
           <option value="">همه</option>
           <option value="NA">بدون فاکتور</option>
-          <option value="Sent">ارسال شده</option>
-          <option value="Received">دریافت شده</option>
+          <option value="SENT">ارسال شده</option>
+          <option value="RECEIVED">دریافت شده</option>
         </select>
       </div>
       <div class="col-span-1">
@@ -174,8 +187,8 @@
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
           <option value="">همه</option>
-          <option value="Terms">نسیه</option>
-          <option value="Paid">پرداخت شده</option>
+          <option value="TERMS">نسیه</option>
+          <option value="PAID">پرداخت شده</option>
         </select>
       </div>
     </div>
@@ -216,6 +229,7 @@ export default {
         shipmentStatus: '',
         shipmentType: '',
         shipmentLocation: '',
+        unloadLocation: '',
         licenseNumber: '',
         customerName: '',
         supplierName: '',
@@ -230,6 +244,18 @@ export default {
         invoiceStatus: '',
         paymentStatus: ''
       },
+      unloadLocationOptions: [
+        { value: '', label: 'همه' },
+        { value: 'Anbar_Muhvateh_Kardan', label: 'انبار محوطه کردان' },
+        { value: 'Anbar_Asli', label: 'انبار اصلی' },
+        { value: 'Anbar_Farangi', label: 'انبار فرنگی' },
+        { value: 'Anbar_Sangin', label: 'انبار محوطه سنگین' },
+        { value: 'Anbar_Khamir_Kordan', label: 'انبار خمیر کردان' },
+        { value: 'Anbar_Muhavateh_Homayoun', label: 'انبار محوطه همایون' },
+        { value: 'Anbar_Khamir_Ghadim', label: 'انبار خمیر قدیم' },
+        { value: 'Anbar_Salon_Tolid', label: 'انبار سالن تولید' },
+        { value: 'Anbar_PAK', label: 'انبار پاک' }
+      ],
       statusOptions: getTranslationOptions('status'),
       invoiceStatusOptions: getTranslationOptions('invoiceStatus'),
       paymentStatusOptions: getTranslationOptions('paymentStatus'),
@@ -245,6 +271,37 @@ export default {
     await this.loadPurchases()
   },
   methods: {
+    translateValue(value, type) {
+      const translations = {
+        status: {
+          'REGISTERED': 'ثبت شده',
+          'LOADING_UNLOADING': 'در حال بارگیری/تخلیه',
+          'LOADED_UNLOADED': 'بارگیری/تخلیه شده',
+          'OFFICE': 'دفتر',
+          'DELIVERED': 'تحویل داده شده',
+          'CANCELLED': 'لغو شده'
+        },
+        invoiceStatus: {
+          'NA': 'بدون فاکتور',
+          'SENT': 'ارسال شده',
+          'RECEIVED': 'دریافت شده'
+        },
+        paymentStatus: {
+          'TERMS': 'نسیه',
+          'PAID': 'پرداخت شده'
+        }
+      }
+
+      // Convert both the input value and the translation keys to uppercase for comparison
+      const upperValue = value?.toUpperCase()
+      const translationMap = translations[type] || {}
+      const translatedValue = Object.entries(translationMap).find(([key]) => 
+        key.toUpperCase() === upperValue
+      )?.[1]
+
+      console.log(`Translating ${type}: ${value} -> ${translatedValue || value}`)
+      return translatedValue || value
+    },
     async loadPurchases() {
       this.loading = true
       try {
@@ -290,9 +347,7 @@ export default {
             }
           }
         })
-        console.log('Raw response:', data) // Debug log
         
-        // Handle empty or invalid responses
         if (!data?.filteredData) {
           console.log('No data received')
           this.purchases = []
@@ -301,17 +356,23 @@ export default {
           return
         }
 
-        // Filter out empty objects and ensure we have valid purchase data
-        const validPurchases = data.filteredData.filter(item => 
-          item && 
-          typeof item === 'object' && 
-          Object.keys(item).length > 0 &&
-          item.id &&
-          item.__typename === 'ShipmentType' &&
-          item.shipmentType === 'Incoming'
-        )
+        // Filter out empty objects and translate values
+        const validPurchases = data.filteredData
+          .filter(item => 
+            item && 
+            typeof item === 'object' && 
+            Object.keys(item).length > 0 &&
+            item.id &&
+            item.__typename === 'ShipmentType' &&
+            item.shipmentType === 'Incoming'
+          )
+          .map(purchase => ({
+            ...purchase,
+            status: this.translateValue(purchase.status, 'status'),
+            invoiceStatus: this.translateValue(purchase.invoiceStatus, 'invoiceStatus'),
+            paymentStatus: this.translateValue(purchase.paymentStatus, 'paymentStatus')
+          }))
 
-        console.log('Valid purchases:', validPurchases) // Debug log
         this.purchases = validPurchases
         this.filteredPurchases = validPurchases
         this.$emit('filter-applied', validPurchases)
@@ -332,6 +393,7 @@ export default {
         shipmentStatus: '',
         shipmentType: '',
         shipmentLocation: '',
+        unloadLocation: '',
         licenseNumber: '',
         customerName: '',
         supplierName: '',

@@ -38,7 +38,9 @@
           v-model="filters.shipmentStatus"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-          <option v-for="option in statusOptions" :value="option.value" :key="option.value">{{ option.label }}</option>
+          <option v-for="option in statusOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
         </select>
       </div>
       <div class="col-span-1">
@@ -47,18 +49,36 @@
           v-model="filters.shipmentType"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-          <option v-for="option in shipmentTypeOptions" :value="option.value" :key="option.value">{{ option.label }}</option>
+          <option v-for="option in shipmentTypeOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
         </select>
       </div>
 
       <!-- Location -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">موقعیت</label>
-        <input 
-          type="text" 
+        <select 
           v-model="filters.shipmentLocation"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
+          <option v-for="option in locationOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Unload Location -->
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700">محل تخلیه</label>
+        <select 
+          v-model="filters.unloadLocation"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+          <option v-for="option in unloadLocationOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
       </div>
 
       <!-- Vehicle and Customer -->
@@ -229,12 +249,33 @@ export default {
         invoiceStatus: '',
         paymentStatus: ''
       },
-      statusOptions: getTranslationOptions('status'),
-      shipmentTypeOptions: getTranslationOptions('shipmentType'),
+      statusOptions: [
+        { value: '', label: 'همه' },
+        { value: 'DELIVERED', label: 'تحویل داده شده' },
+        { value: 'IN_TRANSIT', label: 'در حال انتقال' },
+        { value: 'PENDING', label: 'در انتظار' },
+        { value: 'CANCELLED', label: 'لغو شده' }
+      ],
+      shipmentTypeOptions: [
+        { value: '', label: 'همه' },
+        { value: 'INCOMING', label: 'ورودی' },
+        { value: 'OUTGOING', label: 'خروجی' }
+      ],
+      locationOptions: [
+        { value: '', label: 'همه' },
+        { value: 'DELIVERED', label: 'تحویل داده شده' },
+        { value: 'IN_TRANSIT', label: 'در حال انتقال' },
+        { value: 'PENDING', label: 'در انتظار' },
+        { value: 'CANCELLED', label: 'لغو شده' }
+      ],
+      unloadLocationOptions: [
+        { value: '', label: 'همه' },
+        { value: 'Anbar_Muhvateh_Kardan', label: 'انبار محوطه کردان' },
+        { value: 'Anbar_Asli', label: 'انبار اصلی' },
+        { value: 'Anbar_Farangi', label: 'انبار فرنگی' }
+      ],
       invoiceStatusOptions: getTranslationOptions('invoiceStatus'),
       paymentStatusOptions: getTranslationOptions('paymentStatus'),
-      locationOptions: getTranslationOptions('location'),
-      unloadLocationOptions: getTranslationOptions('unloadLocation'),
       loading: false,
       error: null,
       fieldErrors: {},
@@ -246,6 +287,47 @@ export default {
     await this.loadShipments()
   },
   methods: {
+    translateValue(value, type) {
+      const translations = {
+        location: {
+          'DELIVERED': 'تحویل داده شده',
+          'IN_TRANSIT': 'در حال انتقال',
+          'PENDING': 'در انتظار',
+          'CANCELLED': 'لغو شده'
+        },
+        shipmentType: {
+          'INCOMING': 'ورودی',
+          'OUTGOING': 'خروجی'
+        },
+        status: {
+          'DELIVERED': 'تحویل داده شده',
+          'IN_TRANSIT': 'در حال انتقال',
+          'PENDING': 'در انتظار',
+          'CANCELLED': 'لغو شده'
+        },
+        unloadLocation: {
+          'ANBAR_MUHVATEH_KARDAN': 'انبار محوطه کردان',
+          'Anbar_Sangin': 'انبار محوطه سنگین',
+          "Anbar_Khamir_Kordan": "انبار خمیر کردان",
+          "Anbar_Muhavateh_Homayoun": "انبار محوطه همایون",
+          "Anbar_Khamir_Ghadim": "انبار خمیر قدیم",
+          "Anbar_Salon_Tolid": "انبار سالن تولید",
+          'ANBAR_ASLI': 'انبار اصلی',
+          "Anbar_PAK": "انبار پاک",
+          'ANBAR_FARANGI': 'انبار فرنگی'
+        }
+      }
+
+      // Convert both the input value and the translation keys to uppercase for comparison
+      const upperValue = value?.toUpperCase()
+      const translationMap = translations[type] || {}
+      const translatedValue = Object.entries(translationMap).find(([key]) => 
+        key.toUpperCase() === upperValue
+      )?.[1]
+
+      console.log(`Translating ${type}: ${value} -> ${translatedValue || value}`)
+      return translatedValue || value
+    },
     async loadShipments() {
       this.loading = true
       try {
@@ -310,9 +392,9 @@ export default {
             }
           `
         })
-        console.log('Raw response:', data) // Debug log
         
-        // Handle empty or invalid responses
+        console.log('Raw data from server:', data?.filteredData)
+        
         if (!data?.filteredData) {
           console.log('No data received')
           this.shipments = []
@@ -321,16 +403,29 @@ export default {
           return
         }
 
-        // Filter out empty objects and ensure we have valid shipment data
-        const validShipments = data.filteredData.filter(item => 
-          item && 
-          typeof item === 'object' && 
-          Object.keys(item).length > 0 &&
-          item.id &&
-          item.__typename === 'ShipmentType'
-        )
+        // Filter out empty objects and translate values
+        const validShipments = data.filteredData
+          .filter(item => 
+            item && 
+            typeof item === 'object' && 
+            Object.keys(item).length > 0 &&
+            item.id &&
+            item.__typename === 'ShipmentType'
+          )
+          .map(shipment => {
+            console.log('Processing shipment:', shipment)
+            const translated = {
+              ...shipment,
+              location: this.translateValue(shipment.location, 'location'),
+              shipmentType: this.translateValue(shipment.shipmentType, 'shipmentType'),
+              status: this.translateValue(shipment.status, 'status'),
+              unloadLocation: this.translateValue(shipment.unloadLocation, 'unloadLocation')
+            }
+            console.log('Translated shipment:', translated)
+            return translated
+          })
 
-        console.log('Valid shipments:', validShipments) // Debug log
+        console.log('Final translated shipments:', validShipments)
         this.shipments = validShipments
         this.filteredShipments = validShipments
         this.$emit('filter-applied', validShipments)

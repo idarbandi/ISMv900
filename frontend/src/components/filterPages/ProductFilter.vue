@@ -114,10 +114,10 @@
           ]"
         >
           <option value="">همه</option>
-          <option value="In-stock">موجود</option>
-          <option value="Sold">فروخته شده</option>
-          <option value="Moved">انتقال یافته</option>
-          <option value="Delivered">تحویل داده شده</option>
+          <option value="IN_STOCK">موجود</option>
+          <option value="SOLD">فروخته شده</option>
+          <option value="MOVED">انتقال یافته</option>
+          <option value="DELIVERED">تحویل داده شده</option>
         </select>
         <p v-if="fieldErrors.productStatus" class="mt-1 text-sm text-red-600">{{ fieldErrors.productStatus }}</p>
       </div>
@@ -216,6 +216,15 @@ export default {
     await this.loadProducts()
   },
   methods: {
+    translateStatus(status) {
+      const statusMap = {
+        'IN_STOCK': 'موجود',
+        'SOLD': 'فروخته شده',
+        'MOVED': 'انتقال یافته',
+        'DELIVERED': 'تحویل داده شده'
+      }
+      return statusMap[status] || status
+    },
     async loadProducts() {
       this.loading = true
       try {
@@ -241,10 +250,13 @@ export default {
             }
           `
         })
-        console.log('Products loaded:', data.products) // Debug log
-        this.products = data.products
-        this.filteredProducts = data.products // Initially show all products
-        this.$emit('filter-applied', this.products) // Emit initial data
+        // Translate status for each product
+        this.products = data.products.map(product => ({
+          ...product,
+          status: this.translateStatus(product.status)
+        }))
+        this.filteredProducts = this.products
+        this.$emit('filter-applied', this.products)
       } catch (err) {
         this.error = 'خطا در بارگذاری محصولات'
         console.error('Error loading products:', err)
