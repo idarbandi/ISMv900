@@ -15,23 +15,33 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <!-- Date Range -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">تاریخ شروع</label>
+        <label class="block text-sm font-medium text-gray-700">تاریخ شروع <span class="text-red-500">*</span></label>
         <input 
           type="date" 
           v-model="filters.startDate"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          required
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.startDate ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.startDate" class="mt-1 text-sm text-red-600">{{ fieldErrors.startDate }}</p>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">تاریخ پایان</label>
+        <label class="block text-sm font-medium text-gray-700">تاریخ پایان <span class="text-red-500">*</span></label>
         <input 
           type="date" 
           v-model="filters.endDate"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          required
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.endDate ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.endDate" class="mt-1 text-sm text-red-600">{{ fieldErrors.endDate }}</p>
       </div>
 
-      <!-- Status and Type -->
+      <!-- Status and Location -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">وضعیت</label>
         <select 
@@ -39,17 +49,6 @@
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
           <option v-for="option in statusOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
-      </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">نوع بارنامه</label>
-        <select 
-          v-model="filters.shipmentType"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-          <option v-for="option in shipmentTypeOptions" :key="option.value" :value="option.value">
             {{ option.label }}
           </option>
         </select>
@@ -109,14 +108,6 @@
         >
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">نوع مواد</label>
-        <input 
-          type="text" 
-          v-model="filters.materialType"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-      </div>
-      <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">نام مواد</label>
         <input 
           type="text" 
@@ -125,57 +116,15 @@
         >
       </div>
 
-      <!-- Weights -->
+      <!-- Price -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">وزن اول</label>
-          <input 
-            type="number" 
-          v-model="filters.weight1"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-      </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">وزن دوم</label>
-          <input 
-            type="number" 
-          v-model="filters.weight2"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-      </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">وزن خالص</label>
-          <input 
-          type="text" 
-          v-model="filters.netWeight"
+        <label class="block text-sm font-medium text-gray-700">قیمت هر کیلو</label>
+        <input 
+          type="number" 
+          v-model="filters.pricePerKg"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
       </div>
-
-      <!-- Prices -->
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">قیمت هر کیلو</label>
-          <input 
-            type="number" 
-          v-model="filters.pricePerKg"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-      </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">قیمت کل</label>
-          <input 
-            type="number" 
-          v-model="filters.totalPrice"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-      </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">هزینه اضافی</label>
-          <input 
-            type="number" 
-          v-model="filters.extraCost"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-        </div>
 
       <!-- Status -->
       <div class="col-span-1">
@@ -232,20 +181,13 @@ export default {
         startDate: '',
         endDate: '',
         shipmentStatus: '',
-        shipmentType: '',
         shipmentLocation: '',
         unloadLocation: '',
         licenseNumber: '',
         customerName: '',
         supplierName: '',
-        materialType: '',
         materialName: '',
-        weight1: '',
-        weight2: '',
-        netWeight: '',
         pricePerKg: '',
-        totalPrice: '',
-        extraCost: '',
         invoiceStatus: '',
         paymentStatus: ''
       },
@@ -255,11 +197,6 @@ export default {
         { value: 'IN_TRANSIT', label: 'در حال انتقال' },
         { value: 'PENDING', label: 'در انتظار' },
         { value: 'CANCELLED', label: 'لغو شده' }
-      ],
-      shipmentTypeOptions: [
-        { value: '', label: 'همه' },
-        { value: 'INCOMING', label: 'ورودی' },
-        { value: 'OUTGOING', label: 'خروجی' }
       ],
       locationOptions: [
         { value: '', label: 'همه' },
@@ -295,10 +232,6 @@ export default {
           'PENDING': 'در انتظار',
           'CANCELLED': 'لغو شده'
         },
-        shipmentType: {
-          'INCOMING': 'ورودی',
-          'OUTGOING': 'خروجی'
-        },
         status: {
           'DELIVERED': 'تحویل داده شده',
           'IN_TRANSIT': 'در حال انتقال',
@@ -318,14 +251,12 @@ export default {
         }
       }
 
-      // Convert both the input value and the translation keys to uppercase for comparison
       const upperValue = value?.toUpperCase()
       const translationMap = translations[type] || {}
       const translatedValue = Object.entries(translationMap).find(([key]) => 
         key.toUpperCase() === upperValue
       )?.[1]
 
-      console.log(`Translating ${type}: ${value} -> ${translatedValue || value}`)
       return translatedValue || value
     },
     async loadShipments() {
@@ -335,18 +266,15 @@ export default {
           query: gql`
             query GetAllShipments {
               filteredData(filterInput: { 
+                shipmentType: "Outgoing",
                 shipmentStatus: null,
-                shipmentType: null,
                 shipmentLocation: null,
                 licenseNumber: null,
                 customerName: null,
                 supplierName: null,
-                materialType: null,
                 materialName: null,
                 invoiceStatus: null,
-                paymentStatus: null,
-                startDate: null,
-                endDate: null
+                paymentStatus: null
               }) {
                 ... on ShipmentType {
                   id
@@ -357,29 +285,23 @@ export default {
                   entryTime
                   weight1Time
                   weight2Time
+                  weight1
+                  weight2
                   exitTime
-                  shipmentType
                   licenseNumber
                   customerName
                   supplierName
-                  weight1
                   unloadLocation
                   unit
                   quantity
                   quality
                   penalty
-                  weight2
-                  netWeight
                   listOfReels
                   profileName
                   width
                   salesId
                   pricePerKg
-                  totalPrice
-                  extraCost
-                  materialType
                   materialName
-                  vat
                   invoiceStatus
                   paymentStatus
                   documentInfo
@@ -393,8 +315,6 @@ export default {
           `
         })
         
-        console.log('Raw data from server:', data?.filteredData)
-        
         if (!data?.filteredData) {
           console.log('No data received')
           this.shipments = []
@@ -403,7 +323,6 @@ export default {
           return
         }
 
-        // Filter out empty objects and translate values
         const validShipments = data.filteredData
           .filter(item => 
             item && 
@@ -412,20 +331,13 @@ export default {
             item.id &&
             item.__typename === 'ShipmentType'
           )
-          .map(shipment => {
-            console.log('Processing shipment:', shipment)
-            const translated = {
-              ...shipment,
-              location: this.translateValue(shipment.location, 'location'),
-              shipmentType: this.translateValue(shipment.shipmentType, 'shipmentType'),
-              status: this.translateValue(shipment.status, 'status'),
-              unloadLocation: this.translateValue(shipment.unloadLocation, 'unloadLocation')
-            }
-            console.log('Translated shipment:', translated)
-            return translated
-          })
+          .map(shipment => ({
+            ...shipment,
+            location: this.translateValue(shipment.location, 'location'),
+            status: this.translateValue(shipment.status, 'status'),
+            unloadLocation: this.translateValue(shipment.unloadLocation, 'unloadLocation')
+          }))
 
-        console.log('Final translated shipments:', validShipments)
         this.shipments = validShipments
         this.filteredShipments = validShipments
         this.$emit('filter-applied', validShipments)
@@ -444,20 +356,13 @@ export default {
         startDate: '',
         endDate: '',
         shipmentStatus: '',
-        shipmentType: '',
         shipmentLocation: '',
         unloadLocation: '',
         licenseNumber: '',
         customerName: '',
         supplierName: '',
-        materialType: '',
         materialName: '',
-        weight1: '',
-        weight2: '',
-        netWeight: '',
         pricePerKg: '',
-        totalPrice: '',
-        extraCost: '',
         invoiceStatus: '',
         paymentStatus: ''
       }
@@ -472,6 +377,27 @@ export default {
       this.fieldErrors = {}
       
       try {
+        // Validate dates first
+        if (!this.filters.startDate) {
+          this.fieldErrors.startDate = 'تاریخ شروع الزامی است'
+          this.error = 'لطفا تاریخ شروع را وارد کنید'
+          return
+        }
+        if (!this.filters.endDate) {
+          this.fieldErrors.endDate = 'تاریخ پایان الزامی است'
+          this.error = 'لطفا تاریخ پایان را وارد کنید'
+          return
+        }
+
+        const startDate = new Date(this.filters.startDate)
+        const endDate = new Date(this.filters.endDate)
+
+        if (startDate > endDate) {
+          this.fieldErrors.endDate = 'تاریخ پایان باید بعد از تاریخ شروع باشد'
+          this.error = 'تاریخ پایان باید بعد از تاریخ شروع باشد'
+          return
+        }
+
         const { isValid, errors } = validateForm(this.filters, 'shipment')
         
         if (!isValid) {
@@ -481,38 +407,102 @@ export default {
         }
 
         const cleanFilters = cleanFormData(this.filters)
+        cleanFilters.shipmentType = 'Outgoing'
+
+        // If status is CANCELLED, use the cancelled shipments query
+        if (cleanFilters.shipmentStatus === 'CANCELLED') {
+          const { data } = await apolloClient.query({
+            query: gql`
+              query GetCancelledShipments {
+                shipments(filter: { status: "CANCELLED" }) {
+                  id
+                  date
+                  status
+                  location
+                  receiveDate
+                  entryTime
+                  weight1Time
+                  weight2Time
+                  weight1
+                  weight2
+                  exitTime
+                  licenseNumber
+                  customerName
+                  supplierName
+                  unloadLocation
+                  unit
+                  quantity
+                  quality
+                  penalty
+                  listOfReels
+                  profileName
+                  width
+                  salesId
+                  pricePerKg
+                  materialName
+                  invoiceStatus
+                  paymentStatus
+                  documentInfo
+                  comments
+                  cancellationReason
+                  username
+                  logs
+                }
+              }
+            `
+          })
+          
+          if (!data?.shipments) {
+            console.log('No data received')
+            this.filteredShipments = []
+            this.$emit('filter-applied', [])
+            return
+          }
+
+          const validShipments = data.shipments
+            .filter(item => 
+              item && 
+              typeof item === 'object' && 
+              Object.keys(item).length > 0 &&
+              item.id
+            )
+            .map(shipment => ({
+              ...shipment,
+              location: this.translateValue(shipment.location, 'location'),
+              status: this.translateValue(shipment.status, 'status'),
+              unloadLocation: this.translateValue(shipment.unloadLocation, 'unloadLocation')
+            }))
+
+          this.filteredShipments = validShipments
+          this.$emit('filter-applied', validShipments)
+          return
+        }
         
+        // Regular filtering for non-cancelled status
         this.filteredShipments = this.shipments.filter(shipment => {
           if (Object.keys(cleanFilters).length === 0) return true
 
           if (cleanFilters.shipmentStatus && shipment.status !== cleanFilters.shipmentStatus) return false
-          if (cleanFilters.shipmentType && shipment.shipmentType !== cleanFilters.shipmentType) return false
           if (cleanFilters.shipmentLocation && !shipment.location.includes(cleanFilters.shipmentLocation)) return false
           if (cleanFilters.unloadLocation && shipment.unloadLocation !== cleanFilters.unloadLocation) return false
           if (cleanFilters.licenseNumber && !shipment.licenseNumber.includes(cleanFilters.licenseNumber)) return false
           if (cleanFilters.customerName && !shipment.customerName.includes(cleanFilters.customerName)) return false
           if (cleanFilters.supplierName && !shipment.supplierName.includes(cleanFilters.supplierName)) return false
-          if (cleanFilters.materialType && !shipment.materialType.includes(cleanFilters.materialType)) return false
           if (cleanFilters.materialName && !shipment.materialName.includes(cleanFilters.materialName)) return false
           if (cleanFilters.invoiceStatus && shipment.invoiceStatus !== cleanFilters.invoiceStatus) return false
           if (cleanFilters.paymentStatus && shipment.paymentStatus !== cleanFilters.paymentStatus) return false
-
-          if (cleanFilters.weight1 && shipment.weight1 !== Number(cleanFilters.weight1)) return false
-          if (cleanFilters.weight2 && shipment.weight2 !== Number(cleanFilters.weight2)) return false
-          if (cleanFilters.netWeight && shipment.netWeight !== Number(cleanFilters.netWeight)) return false
           if (cleanFilters.pricePerKg && shipment.pricePerKg !== Number(cleanFilters.pricePerKg)) return false
-          if (cleanFilters.totalPrice && shipment.totalPrice !== Number(cleanFilters.totalPrice)) return false
-          if (cleanFilters.extraCost && shipment.extraCost !== Number(cleanFilters.extraCost)) return false
 
-          if (cleanFilters.startDate) {
-            const startDate = new Date(cleanFilters.startDate)
+          if (cleanFilters.startDate || cleanFilters.endDate) {
             const shipmentDate = new Date(shipment.date)
-            if (shipmentDate < startDate) return false
-          }
-          if (cleanFilters.endDate) {
-            const endDate = new Date(cleanFilters.endDate)
-            const shipmentDate = new Date(shipment.date)
-            if (shipmentDate > endDate) return false
+            if (cleanFilters.startDate) {
+              const startDate = new Date(cleanFilters.startDate)
+              if (shipmentDate < startDate) return false
+            }
+            if (cleanFilters.endDate) {
+              const endDate = new Date(cleanFilters.endDate)
+              if (shipmentDate > endDate) return false
+            }
           }
 
           return true

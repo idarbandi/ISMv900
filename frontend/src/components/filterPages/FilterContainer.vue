@@ -197,28 +197,20 @@ const SHIPMENT_FILTER_QUERY = gql`
         weight1Time
         weight2Time
         exitTime
-        shipmentType
         licenseNumber
         customerName
         supplierName
-        weight1
         unloadLocation
         unit
         quantity
         quality
         penalty
-        weight2
-        netWeight
         listOfReels
         profileName
         width
         salesId
         pricePerKg
-        totalPrice
-        extraCost
-        materialType
         materialName
-        vat
         invoiceStatus
         paymentStatus
         documentInfo
@@ -290,29 +282,23 @@ export default {
         'زمان ورود',
         'زمان وزن اول',
         'زمان وزن دوم',
+        'وزن اول',
+        'وزن دوم',
         'زمان خروج',
-        'نوع ارسال',
         'شماره پلاک',
         'نام مشتری',
         'نام تامین کننده',
-        'وزن اول',
         'موقعیت تخلیه',
         'واحد',
         'تعداد',
         'کیفیت',
         'جریمه',
-        'وزن دوم',
-        'وزن خالص',
         'لیست رول‌ها',
         'نام پروفایل',
         'عرض',
         'کد فروش',
         'قیمت هر کیلو',
-        'قیمت کل',
-        'هزینه اضافی',
-        'نوع مواد',
         'نام مواد',
-        'مالیات بر ارزش افزوده',
         'وضعیت فاکتور',
         'وضعیت پرداخت',
         'اطلاعات سند',
@@ -363,29 +349,23 @@ export default {
         item.entryTime,
         item.weight1Time,
         item.weight2Time,
+        item.weight1,
+        item.weight2,
         item.exitTime,
-        translate('shipmentType', item.shipmentType),
         item.licenseNumber,
         item.customerName,
         item.supplierName,
-        item.weight1,
         translate('location', item.unloadLocation),
         item.unit,
         item.quantity,
         item.quality,
         item.penalty,
-        item.weight2,
-        item.netWeight,
         item.listOfReels,
         item.profileName,
         item.width,
         item.salesId,
         item.pricePerKg,
-        item.totalPrice,
-        item.extraCost,
-        item.materialType,
         item.materialName,
-        item.vat,
         translate('invoiceStatus', item.invoiceStatus),
         translate('paymentStatus', item.paymentStatus),
         item.documentInfo,

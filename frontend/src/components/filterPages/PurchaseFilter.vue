@@ -15,20 +15,30 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <!-- Date Range -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">تاریخ شروع</label>
+        <label class="block text-sm font-medium text-gray-700">تاریخ شروع <span class="text-red-500">*</span></label>
         <input 
           type="date" 
           v-model="filters.startDate"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          required
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.startDate ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.startDate" class="mt-1 text-sm text-red-600">{{ fieldErrors.startDate }}</p>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">تاریخ پایان</label>
+        <label class="block text-sm font-medium text-gray-700">تاریخ پایان <span class="text-red-500">*</span></label>
         <input 
           type="date" 
           v-model="filters.endDate"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          required
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.endDate ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.endDate" class="mt-1 text-sm text-red-600">{{ fieldErrors.endDate }}</p>
       </div>
 
       <!-- Vehicle and Customer -->
@@ -55,117 +65,68 @@
         <input 
           type="text" 
           v-model="filters.supplierName"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.supplierName ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.supplierName" class="mt-1 text-sm text-red-600">{{ fieldErrors.supplierName }}</p>
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">نوع مواد</label>
         <input 
           type="text" 
           v-model="filters.materialType"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.materialType ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.materialType" class="mt-1 text-sm text-red-600">{{ fieldErrors.materialType }}</p>
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">نام مواد</label>
         <input 
           type="text" 
           v-model="filters.materialName"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.materialName ? 'border-red-500' : ''
+          ]"
         >
+        <p v-if="fieldErrors.materialName" class="mt-1 text-sm text-red-600">{{ fieldErrors.materialName }}</p>
       </div>
 
-      <!-- Width -->
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">عرض</label>
-        <select 
-          v-model="filters.width"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-          <option value="">انتخاب کنید</option>
-          <option value="210">2/10</option>
-          <option value="220">2/20</option>
-          <option value="230">2/30</option>
-          <option value="240">2/40</option>
-          <option value="250">2/50</option>
-        </select>
-      </div>
-
-      <!-- Weights -->
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">وزن اول</label>
-          <input 
-            type="number" 
-          v-model="filters.weight1"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-      </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">وزن دوم</label>
-          <input 
-            type="number" 
-          v-model="filters.weight2"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-      </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">وزن خالص</label>
-          <input 
-          type="text" 
-          v-model="filters.netWeight"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-      </div>
-
-      <!-- Prices -->
+      <!-- Price -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">قیمت هر کیلو</label>
-          <input 
-            type="number" 
+        <input 
+          type="number" 
           v-model="filters.pricePerKg"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.pricePerKg ? 'border-red-500' : ''
+          ]"
+        >
+        <p v-if="fieldErrors.pricePerKg" class="mt-1 text-sm text-red-600">{{ fieldErrors.pricePerKg }}</p>
       </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">قیمت کل</label>
-          <input 
-            type="number" 
-          v-model="filters.totalPrice"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-      </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">هزینه اضافی</label>
-          <input 
-            type="number" 
-          v-model="filters.extraCost"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-        </div>
 
       <!-- Status -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">وضعیت فاکتور</label>
-        <select 
-          v-model="filters.invoiceStatus"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-          <option value="">همه</option>
-          <option value="NA">بدون فاکتور</option>
-          <option value="SENT">ارسال شده</option>
-          <option value="RECEIVED">دریافت شده</option>
-        </select>
-      </div>
-      <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">وضعیت پرداخت</label>
         <select 
-          v-model="filters.paymentStatus"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          v-model="filters.status"
+          :class="[
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+            fieldErrors.status ? 'border-red-500' : ''
+          ]"
         >
           <option value="">همه</option>
-          <option value="TERMS">نسیه</option>
-          <option value="PAID">پرداخت شده</option>
+          <option value="Paid">پرداخت شده</option>
+          <option value="Terms">نسیه</option>
+          <option value="Cancelled">لغو شده</option>
         </select>
+        <p v-if="fieldErrors.status" class="mt-1 text-sm text-red-600">{{ fieldErrors.status }}</p>
       </div>
     </div>
 
@@ -202,32 +163,18 @@ export default {
       filters: {
         startDate: '',
         endDate: '',
-        licenseNumber: '',
-        customerName: '',
+        status: '',
+        pricePerKg: '',
         supplierName: '',
         materialType: '',
         materialName: '',
-        width: '',
-        weight1: '',
-        weight2: '',
-        netWeight: '',
-        pricePerKg: '',
-        totalPrice: '',
-        extraCost: '',
         invoiceStatus: '',
-        paymentStatus: ''
+        licenseNumber: '',
+        invoiceNumber: '',
+        documentInfo: '',
+        comments: '',
+        cancellationReason: ''
       },
-      invoiceStatusOptions: [
-        { value: '', label: 'همه' },
-        { value: 'NA', label: 'بدون فاکتور' },
-        { value: 'SENT', label: 'ارسال شده' },
-        { value: 'RECEIVED', label: 'دریافت شده' }
-      ],
-      paymentStatusOptions: [
-        { value: '', label: 'همه' },
-        { value: 'TERMS', label: 'نسیه' },
-        { value: 'PAID', label: 'پرداخت شده' }
-      ],
       loading: false,
       error: null,
       fieldErrors: {},
@@ -236,7 +183,6 @@ export default {
     }
   },
   async created() {
-    // Load initial data when component is created
     await this.loadPurchases()
   },
   methods: {
@@ -248,30 +194,40 @@ export default {
           'RECEIVED': 'دریافت شده'
         },
         paymentStatus: {
-          'TERMS': 'نسیه',
-          'PAID': 'پرداخت شده'
+          'Terms': 'نسیه',
+          'Paid': 'پرداخت شده',
+          'Cancelled': 'لغو شده'
         }
       }
 
-      // Convert both the input value and the translation keys to uppercase for comparison
       const upperValue = value?.toUpperCase()
       const translationMap = translations[type] || {}
       const translatedValue = Object.entries(translationMap).find(([key]) => 
         key.toUpperCase() === upperValue
       )?.[1]
 
-      console.log(`Translating ${type}: ${value} -> ${translatedValue || value}`)
       return translatedValue || value
+    },
+    getStatusValue(persianStatus) {
+      const statusMap = {
+        'پرداخت شده': 'Paid',
+        'نسیه': 'Terms',
+        'لغو شده': 'Cancelled'
+      }
+      return statusMap[persianStatus] || persianStatus
     },
     async loadPurchases() {
       this.loading = true
       try {
         const { data } = await apolloClient.query({
           query: gql`
-            query {
-              purchases {
+            query GetTermsPurchases {
+              filteredPurchases(filterInput: { 
+                status: "${this.filters.status || 'Paid'}"
+              }) {
                 id
                 date
+                status
                 receiveDate
                 paymentDate
                 licenseNumber
@@ -301,7 +257,7 @@ export default {
           `
         })
         
-        if (!data?.purchases) {
+        if (!data?.filteredPurchases) {
           console.log('No data received')
           this.purchases = []
           this.filteredPurchases = []
@@ -309,8 +265,7 @@ export default {
           return
         }
 
-        // Filter out empty objects and translate values
-        const validPurchases = data.purchases
+        const validPurchases = data.filteredPurchases
           .filter(item => 
             item && 
             typeof item === 'object' && 
@@ -340,20 +295,17 @@ export default {
       this.filters = {
         startDate: '',
         endDate: '',
-        licenseNumber: '',
-        customerName: '',
+        status: '',
+        pricePerKg: '',
         supplierName: '',
         materialType: '',
         materialName: '',
-        width: '',
-        weight1: '',
-        weight2: '',
-        netWeight: '',
-        pricePerKg: '',
-        totalPrice: '',
-        extraCost: '',
         invoiceStatus: '',
-        paymentStatus: ''
+        licenseNumber: '',
+        invoiceNumber: '',
+        documentInfo: '',
+        comments: '',
+        cancellationReason: ''
       }
       this.fieldErrors = {}
       this.error = null
@@ -366,6 +318,27 @@ export default {
       this.fieldErrors = {}
       
       try {
+        // Validate dates first
+        if (!this.filters.startDate) {
+          this.fieldErrors.startDate = 'تاریخ شروع الزامی است'
+          this.error = 'لطفا تاریخ شروع را وارد کنید'
+          return
+        }
+        if (!this.filters.endDate) {
+          this.fieldErrors.endDate = 'تاریخ پایان الزامی است'
+          this.error = 'لطفا تاریخ پایان را وارد کنید'
+          return
+        }
+
+        const startDate = new Date(this.filters.startDate)
+        const endDate = new Date(this.filters.endDate)
+
+        if (startDate > endDate) {
+          this.fieldErrors.endDate = 'تاریخ پایان باید بعد از تاریخ شروع باشد'
+          this.error = 'تاریخ پایان باید بعد از تاریخ شروع باشد'
+          return
+        }
+
         const { isValid, errors } = validateForm(this.filters, 'purchase')
         
         if (!isValid) {
@@ -375,13 +348,16 @@ export default {
         }
 
         const cleanFilters = cleanFormData(this.filters)
-        
+
         const { data } = await apolloClient.query({
           query: gql`
-            query FilterPurchases($filterInput: PurchaseFilterInput) {
-              filteredPurchases(filterInput: $filterInput) {
+            query GetTermsPurchases {
+              filteredPurchases(filterInput: { 
+                status: "${cleanFilters.status || 'Paid'}"
+              }) {
                 id
                 date
+                status
                 receiveDate
                 paymentDate
                 licenseNumber
@@ -408,10 +384,7 @@ export default {
                 logs
               }
             }
-          `,
-          variables: {
-            filterInput: cleanFilters
-          }
+          `
         })
 
         if (!data?.filteredPurchases) {
@@ -421,7 +394,6 @@ export default {
           return
         }
 
-        // Filter out empty objects and translate values
         const validPurchases = data.filteredPurchases
           .filter(item => 
             item && 
@@ -429,6 +401,10 @@ export default {
             Object.keys(item).length > 0 &&
             item.id
           )
+          .filter(purchase => {
+            const purchaseDate = new Date(purchase.date)
+            return purchaseDate >= startDate && purchaseDate <= endDate
+          })
           .map(purchase => ({
             ...purchase,
             invoiceStatus: this.translateValue(purchase.invoiceStatus, 'invoiceStatus'),

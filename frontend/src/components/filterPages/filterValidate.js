@@ -19,11 +19,14 @@ export const filterValidations = {
       message: 'شماره رول باید متن باشد'
     },
     productWidth: {
-      type: 'number',
-      message: 'عرض باید عدد باشد',
+      type: 'array',
+      message: 'عرض باید از لیست انتخاب شود',
       validate: (value) => {
-        if (value && (value < 0 || value > 10000)) {
-          return 'عرض باید بین 0 تا 10000 باشد'
+        if (!Array.isArray(value)) return 'عرض باید از لیست انتخاب شود'
+        const validWidths = ['210', '220', '230', '240', '250']
+        const invalidWidths = value.filter(width => !validWidths.includes(width))
+        if (invalidWidths.length > 0) {
+          return 'عرض انتخاب شده نامعتبر است'
         }
         return true
       }
@@ -89,72 +92,12 @@ export const filterValidations = {
       type: 'string',
       message: 'نام مواد باید متن باشد'
     },
-    minQuantity: {
-      type: 'number',
-      message: 'حداقل تعداد باید عدد باشد',
-      validate: (value, form) => {
-        if (value && form.maxQuantity && value > form.maxQuantity) {
-          return 'حداقل تعداد نمی‌تواند بیشتر از حداکثر باشد'
-        }
-        return true
-      }
-    },
-    maxQuantity: {
-      type: 'number',
-      message: 'حداکثر تعداد باید عدد باشد',
-      validate: (value, form) => {
-        if (value && form.minQuantity && value < form.minQuantity) {
-          return 'حداکثر تعداد نمی‌تواند کمتر از حداقل باشد'
-        }
-        return true
-      }
-    },
-    minWeight: {
-      type: 'number',
-      message: 'حداقل وزن باید عدد باشد',
-      validate: (value, form) => {
-        if (value && form.maxWeight && value > form.maxWeight) {
-          return 'حداقل وزن نمی‌تواند بیشتر از حداکثر باشد'
-        }
-        return true
-      }
-    },
-    maxWeight: {
-      type: 'number',
-      message: 'حداکثر وزن باید عدد باشد',
-      validate: (value, form) => {
-        if (value && form.minWeight && value < form.minWeight) {
-          return 'حداکثر وزن نمی‌تواند کمتر از حداقل باشد'
-        }
-        return true
-      }
-    },
     pricePerKg: {
       type: 'number',
       message: 'قیمت هر کیلو باید عدد باشد',
       validate: (value) => {
         if (value && value < 0) {
           return 'قیمت هر کیلو نمی‌تواند منفی باشد'
-        }
-        return true
-      }
-    },
-    totalPrice: {
-      type: 'number',
-      message: 'قیمت کل باید عدد باشد',
-      validate: (value) => {
-        if (value && value < 0) {
-          return 'قیمت کل نمی‌تواند منفی باشد'
-        }
-        return true
-      }
-    },
-    extraCost: {
-      type: 'number',
-      message: 'هزینه اضافی باید عدد باشد',
-      validate: (value) => {
-        if (value && value < 0) {
-          return 'هزینه اضافی نمی‌تواند منفی باشد'
         }
         return true
       }
@@ -183,31 +126,67 @@ export const handleEmptyResponse = (data) => {
 }
 
 // Validation helper functions
-export const validateField = (value, rules) => {
-  if (!rules) return true
-
-  // Clean string values before validation
-  const cleanedValue = cleanStringValue(value)
-
-  // Check type
-  if (rules.type && typeof cleanedValue !== rules.type) {
-    return rules.message
+export const validateField = (value, field, type) => {
+  switch (field) {
+    case 'status':
+      if (type === 'purchase') {
+        if (value && !['Paid', 'Terms', 'Cancelled'].includes(value)) {
+          return 'وضعیت نامعتبر است'
+        }
+      } else if (value && !['DELIVERED', 'IN_TRANSIT', 'PENDING', 'CANCELLED'].includes(value)) {
+        return 'وضعیت نامعتبر است'
+      }
+      return null
+    case 'shipmentStatus':
+      if (value && !['DELIVERED', 'IN_TRANSIT', 'PENDING', 'CANCELLED'].includes(value)) {
+        return 'وضعیت نامعتبر است'
+      }
+      return null
+    case 'shipmentLocation':
+      if (value && !['DELIVERED', 'IN_TRANSIT', 'PENDING', 'CANCELLED'].includes(value)) {
+        return 'موقعیت نامعتبر است'
+      }
+      return null
+    case 'unloadLocation':
+      if (value && !['Anbar_Muhvateh_Kardan', 'Anbar_Asli', 'Anbar_Farangi'].includes(value)) {
+        return 'محل تخلیه نامعتبر است'
+      }
+      return null
+    case 'invoiceStatus':
+      if (value && !['NA', 'SENT', 'RECEIVED'].includes(value)) {
+        return 'وضعیت فاکتور نامعتبر است'
+      }
+      return null
+    case 'paymentStatus':
+      if (value && !['TERMS', 'PAID'].includes(value)) {
+        return 'وضعیت پرداخت نامعتبر است'
+      }
+      return null
+    case 'productStatus':
+      if (value && !['IN_STOCK', 'SOLD', 'MOVED', 'DELIVERED'].includes(value)) {
+        return 'وضعیت نامعتبر است'
+      }
+      return null
+    case 'productWidth':
+      if (value && value.length > 0) {
+        const validWidths = ['210', '220', '230', '240', '250']
+        const invalidWidths = value.filter(width => !validWidths.includes(width))
+        if (invalidWidths.length > 0) {
+          return 'عرض انتخاب شده نامعتبر است'
+        }
+      }
+      return null
+    case 'productLength':
+    case 'productGsm':
+    case 'productBreaks':
+    case 'pricePerKg':
+      if (value && isNaN(Number(value))) {
+        return 'مقدار باید عدد باشد'
+      }
+      return null
+    default:
+      return null
   }
-
-  // Check enum
-  if (rules.enum && !rules.enum.includes(cleanedValue)) {
-    return rules.message
-  }
-
-  // Run custom validation
-  if (rules.validate) {
-    const result = rules.validate(cleanedValue)
-    if (result !== true) {
-      return result
-    }
-  }
-
-  return true
 }
 
 export const validateForm = (form, type) => {
@@ -217,12 +196,15 @@ export const validateForm = (form, type) => {
     ...filterValidations[type]
   }
 
+  // Only validate fields that have values
   Object.keys(form).forEach(field => {
-    const rules = validations[field]
-    if (rules) {
-      const error = validateField(form[field], rules)
-      if (error !== true) {
-        errors[field] = error
+    if (form[field] !== '' && form[field] !== null && form[field] !== undefined) {
+      const rules = validations[field]
+      if (rules) {
+        const error = validateField(form[field], field, type)
+        if (error !== null) {
+          errors[field] = error
+        }
       }
     }
   })
