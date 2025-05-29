@@ -237,8 +237,6 @@ const PURCHASE_FILTER_QUERY = gql`
       ... on ShipmentType {
         id
         date
-        status
-        location
         supplierName
         materialType
         materialName
@@ -327,8 +325,6 @@ export default {
     purchaseTableHeaders() {
       return [
         'تاریخ',
-        'وضعیت',
-        'موقعیت',
         'نام تامین کننده',
         'نوع مواد',
         'نام مواد',
@@ -402,8 +398,6 @@ export default {
     getPurchaseTableFields(item) {
       return [
         item.date,
-        item.status,
-        item.location,
         item.supplierName,
         item.materialType,
         item.materialName,

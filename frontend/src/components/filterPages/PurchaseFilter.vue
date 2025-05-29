@@ -31,46 +31,6 @@
         >
       </div>
 
-      <!-- Status and Type -->
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">وضعیت</label>
-        <select 
-          v-model="filters.shipmentStatus"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-          <option value="">همه</option>
-          <option value="REGISTERED">ثبت شده</option>
-          <option value="LOADING_UNLOADING">در حال بارگیری/تخلیه</option>
-          <option value="LOADED_UNLOADED">بارگیری/تخلیه شده</option>
-          <option value="OFFICE">دفتر</option>
-          <option value="DELIVERED">تحویل داده شده</option>
-          <option value="CANCELLED">لغو شده</option>
-        </select>
-      </div>
-
-      <!-- Location -->
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">موقعیت</label>
-        <input 
-          type="text" 
-          v-model="filters.shipmentLocation"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-      </div>
-
-      <!-- Unload Location -->
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">محل تخلیه</label>
-        <select 
-          v-model="filters.unloadLocation"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-          <option v-for="option in unloadLocationOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
-      </div>
-
       <!-- Vehicle and Customer -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">شماره پلاک</label>
@@ -113,6 +73,22 @@
           v-model="filters.materialName"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
+      </div>
+
+      <!-- Width -->
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700">عرض</label>
+        <select 
+          v-model="filters.width"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+          <option value="">انتخاب کنید</option>
+          <option value="210">2/10</option>
+          <option value="220">2/20</option>
+          <option value="230">2/30</option>
+          <option value="240">2/40</option>
+          <option value="250">2/50</option>
+        </select>
       </div>
 
       <!-- Weights -->
@@ -226,15 +202,12 @@ export default {
       filters: {
         startDate: '',
         endDate: '',
-        shipmentStatus: '',
-        shipmentType: '',
-        shipmentLocation: '',
-        unloadLocation: '',
         licenseNumber: '',
         customerName: '',
         supplierName: '',
         materialType: '',
         materialName: '',
+        width: '',
         weight1: '',
         weight2: '',
         netWeight: '',
@@ -244,21 +217,17 @@ export default {
         invoiceStatus: '',
         paymentStatus: ''
       },
-      unloadLocationOptions: [
+      invoiceStatusOptions: [
         { value: '', label: 'همه' },
-        { value: 'Anbar_Muhvateh_Kardan', label: 'انبار محوطه کردان' },
-        { value: 'Anbar_Asli', label: 'انبار اصلی' },
-        { value: 'Anbar_Farangi', label: 'انبار فرنگی' },
-        { value: 'Anbar_Sangin', label: 'انبار محوطه سنگین' },
-        { value: 'Anbar_Khamir_Kordan', label: 'انبار خمیر کردان' },
-        { value: 'Anbar_Muhavateh_Homayoun', label: 'انبار محوطه همایون' },
-        { value: 'Anbar_Khamir_Ghadim', label: 'انبار خمیر قدیم' },
-        { value: 'Anbar_Salon_Tolid', label: 'انبار سالن تولید' },
-        { value: 'Anbar_PAK', label: 'انبار پاک' }
+        { value: 'NA', label: 'بدون فاکتور' },
+        { value: 'SENT', label: 'ارسال شده' },
+        { value: 'RECEIVED', label: 'دریافت شده' }
       ],
-      statusOptions: getTranslationOptions('status'),
-      invoiceStatusOptions: getTranslationOptions('invoiceStatus'),
-      paymentStatusOptions: getTranslationOptions('paymentStatus'),
+      paymentStatusOptions: [
+        { value: '', label: 'همه' },
+        { value: 'TERMS', label: 'نسیه' },
+        { value: 'PAID', label: 'پرداخت شده' }
+      ],
       loading: false,
       error: null,
       fieldErrors: {},
@@ -273,14 +242,6 @@ export default {
   methods: {
     translateValue(value, type) {
       const translations = {
-        status: {
-          'REGISTERED': 'ثبت شده',
-          'LOADING_UNLOADING': 'در حال بارگیری/تخلیه',
-          'LOADED_UNLOADED': 'بارگیری/تخلیه شده',
-          'OFFICE': 'دفتر',
-          'DELIVERED': 'تحویل داده شده',
-          'CANCELLED': 'لغو شده'
-        },
         invoiceStatus: {
           'NA': 'بدون فاکتور',
           'SENT': 'ارسال شده',
@@ -307,48 +268,40 @@ export default {
       try {
         const { data } = await apolloClient.query({
           query: gql`
-            query FilterPurchaseData($filterInput: FilterInput) {
-              filteredData(filterInput: $filterInput) {
-                ... on ShipmentType {
-                  id
-                  date
-                  status
-                  location
-                  supplierName
-                  materialType
-                  materialName
-                  pricePerKg
-                  totalPrice
-                  vat
-                  extraCost
-                  paymentStatus
-                  documentInfo
-                  comments
-                  username
-                  logs
-                }
+            query {
+              purchases {
+                id
+                date
+                receiveDate
+                paymentDate
+                licenseNumber
+                materialType
+                materialName
+                supplierName
+                unit
+                quantity
+                quality
+                penalty
+                weight1
+                weight2
+                pricePerKg
+                vat
+                totalPrice
+                extraCost
+                invoiceStatus
+                paymentDetails
+                invoiceNumber
+                documentInfo
+                comments
+                cancellationReason
+                username
+                logs
               }
             }
-          `,
-          variables: {
-            filterInput: {
-              shipmentType: "Incoming",
-              shipmentStatus: null,
-              shipmentLocation: null,
-              licenseNumber: null,
-              customerName: null,
-              supplierName: null,
-              materialType: null,
-              materialName: null,
-              invoiceStatus: null,
-              paymentStatus: null,
-              startDate: null,
-              endDate: null
-            }
-          }
+          `
         })
         
-        if (!data?.filteredData) {
+        if (!data?.purchases) {
           console.log('No data received')
           this.purchases = []
           this.filteredPurchases = []
@@ -357,18 +310,15 @@ export default {
         }
 
         // Filter out empty objects and translate values
-        const validPurchases = data.filteredData
+        const validPurchases = data.purchases
           .filter(item => 
             item && 
             typeof item === 'object' && 
             Object.keys(item).length > 0 &&
-            item.id &&
-            item.__typename === 'ShipmentType' &&
-            item.shipmentType === 'Incoming'
+            item.id
           )
           .map(purchase => ({
             ...purchase,
-            status: this.translateValue(purchase.status, 'status'),
             invoiceStatus: this.translateValue(purchase.invoiceStatus, 'invoiceStatus'),
             paymentStatus: this.translateValue(purchase.paymentStatus, 'paymentStatus')
           }))
@@ -390,15 +340,12 @@ export default {
       this.filters = {
         startDate: '',
         endDate: '',
-        shipmentStatus: '',
-        shipmentType: '',
-        shipmentLocation: '',
-        unloadLocation: '',
         licenseNumber: '',
         customerName: '',
         supplierName: '',
         materialType: '',
         materialName: '',
+        width: '',
         weight1: '',
         weight2: '',
         netWeight: '',
@@ -419,7 +366,7 @@ export default {
       this.fieldErrors = {}
       
       try {
-        const { isValid, errors } = validateForm(this.filters, 'shipment')
+        const { isValid, errors } = validateForm(this.filters, 'purchase')
         
         if (!isValid) {
           this.fieldErrors = errors
@@ -429,58 +376,64 @@ export default {
 
         const cleanFilters = cleanFormData(this.filters)
         
-        // Add shipmentType to filter for purchases
-        const filterInput = {
-          ...cleanFilters,
-          shipmentType: "Incoming"
-        }
-
         const { data } = await apolloClient.query({
           query: gql`
-            query FilterPurchaseData($filterInput: FilterInput) {
-              filteredData(filterInput: $filterInput) {
-                ... on ShipmentType {
-                  id
-                  date
-                  status
-                  location
-                  supplierName
-                  materialType
-                  materialName
-                  pricePerKg
-                  totalPrice
-                  vat
-                  extraCost
-                  paymentStatus
-                  documentInfo
-                  comments
-                  username
-                  logs
-                }
+            query FilterPurchases($filterInput: PurchaseFilterInput) {
+              filteredPurchases(filterInput: $filterInput) {
+                id
+                date
+                receiveDate
+                paymentDate
+                licenseNumber
+                materialType
+                materialName
+                supplierName
+                unit
+                quantity
+                quality
+                penalty
+                weight1
+                weight2
+                pricePerKg
+                vat
+                totalPrice
+                extraCost
+                invoiceStatus
+                paymentDetails
+                invoiceNumber
+                documentInfo
+                comments
+                cancellationReason
+                username
+                logs
               }
             }
           `,
           variables: {
-            filterInput
+            filterInput: cleanFilters
           }
         })
 
-        if (!data?.filteredData) {
+        if (!data?.filteredPurchases) {
           console.log('No data received')
           this.filteredPurchases = []
           this.$emit('filter-applied', [])
           return
         }
 
-        // Filter out empty objects and ensure we have valid purchase data
-        const validPurchases = data.filteredData.filter(item => 
-          item && 
-          typeof item === 'object' && 
-          Object.keys(item).length > 0 &&
-          item.id &&
-          item.__typename === 'ShipmentType' &&
-          item.shipmentType === 'Incoming'
-        )
+        // Filter out empty objects and translate values
+        const validPurchases = data.filteredPurchases
+          .filter(item => 
+            item && 
+            typeof item === 'object' && 
+            Object.keys(item).length > 0 &&
+            item.id
+          )
+          .map(purchase => ({
+            ...purchase,
+            invoiceStatus: this.translateValue(purchase.invoiceStatus, 'invoiceStatus'),
+            paymentStatus: this.translateValue(purchase.paymentStatus, 'paymentStatus')
+          }))
 
         this.filteredPurchases = validPurchases
         this.$emit('filter-applied', validPurchases)

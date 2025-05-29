@@ -67,15 +67,21 @@
 
       <!-- Measurements -->
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">عرض (میلی‌متر)</label>
-        <input 
-          type="number" 
+        <label class="block text-sm font-medium text-gray-700">عرض</label>
+        <select 
           v-model="filters.productWidth"
           :class="[
             'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
             fieldErrors.productWidth ? 'border-red-500' : ''
           ]"
         >
+          <option value="">انتخاب کنید</option>
+          <option value="210">2/10</option>
+          <option value="220">2/20</option>
+          <option value="230">2/30</option>
+          <option value="240">2/40</option>
+          <option value="250">2/50</option>
+        </select>
         <p v-if="fieldErrors.productWidth" class="mt-1 text-sm text-red-600">{{ fieldErrors.productWidth }}</p>
       </div>
       <div class="col-span-1">
@@ -89,18 +95,6 @@
           ]"
         >
         <p v-if="fieldErrors.productGsm" class="mt-1 text-sm text-red-600">{{ fieldErrors.productGsm }}</p>
-      </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">طول (متر)</label>
-        <input 
-          type="number" 
-          v-model="filters.productLength"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.productLength ? 'border-red-500' : ''
-          ]"
-        >
-        <p v-if="fieldErrors.productLength" class="mt-1 text-sm text-red-600">{{ fieldErrors.productLength }}</p>
       </div>
 
       <!-- Status and Location -->
@@ -197,7 +191,6 @@ export default {
         productReelNumber: '',
         productWidth: '',
         productGsm: '',
-        productLength: '',
         productGrade: '',
         productStatus: '',
         productLocation: '',
@@ -207,12 +200,11 @@ export default {
       loading: false,
       error: null,
       fieldErrors: {},
-      products: [], // Store all products
-      filteredProducts: [] // Store filtered products
+      products: [],
+      filteredProducts: []
     }
   },
   async created() {
-    // Load initial data when component is created
     await this.loadProducts()
   },
   methods: {
@@ -250,7 +242,6 @@ export default {
             }
           `
         })
-        // Translate status for each product
         this.products = data.products.map(product => ({
           ...product,
           status: this.translateStatus(product.status)
@@ -271,7 +262,6 @@ export default {
         productReelNumber: '',
         productWidth: '',
         productGsm: '',
-        productLength: '',
         productGrade: '',
         productStatus: '',
         productLocation: '',
@@ -280,7 +270,7 @@ export default {
       }
       this.fieldErrors = {}
       this.error = null
-      this.filteredProducts = this.products // Reset to show all products
+      this.filteredProducts = this.products
       this.$emit('filter-reset', this.products)
     },
     async applyFilters() {
@@ -289,7 +279,6 @@ export default {
       this.fieldErrors = {}
       
       try {
-        // Validate form
         const { isValid, errors } = validateForm(this.filters, 'product')
         
         if (!isValid) {
@@ -298,26 +287,20 @@ export default {
           return
         }
 
-        // Clean filter data
         const cleanFilters = cleanFormData(this.filters)
         
-        // Filter products based on criteria
         this.filteredProducts = this.products.filter(product => {
-          // If no filters are applied, show all products
           if (Object.keys(cleanFilters).length === 0) return true
 
-          // Apply each filter if it exists
           if (cleanFilters.productReelNumber && !product.reelNumber.includes(cleanFilters.productReelNumber)) return false
           if (cleanFilters.productWidth && product.width !== Number(cleanFilters.productWidth)) return false
           if (cleanFilters.productGsm && product.gsm !== Number(cleanFilters.productGsm)) return false
-          if (cleanFilters.productLength && product.length !== Number(cleanFilters.productLength)) return false
           if (cleanFilters.productGrade && product.grade !== cleanFilters.productGrade) return false
           if (cleanFilters.productStatus && product.status !== cleanFilters.productStatus) return false
           if (cleanFilters.productLocation && !product.location.includes(cleanFilters.productLocation)) return false
           if (cleanFilters.productProfileName && !product.profileName.includes(cleanFilters.productProfileName)) return false
           if (cleanFilters.productBreaks && product.breaks !== Number(cleanFilters.productBreaks)) return false
 
-          // Date range filtering
           if (cleanFilters.startDate) {
             const startDate = new Date(cleanFilters.startDate)
             const productDate = new Date(product.receiveDate)
@@ -332,7 +315,6 @@ export default {
           return true
         })
 
-        // Emit filtered products
         this.$emit('filter-applied', this.filteredProducts)
       } catch (err) {
         this.error = err.message
@@ -343,4 +325,4 @@ export default {
     }
   }
 }
-</script> 
+</script>

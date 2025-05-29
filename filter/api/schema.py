@@ -1,8 +1,9 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.contrib.auth import get_user_model
-from myapp.models import Customer, Products, Sales, Shipments, Truck
+from myapp.models import Customer, Products, Sales, Shipments, Truck, Purchases
 from django.db.models import Q
+from .purchases import PurchaseType, PurchaseFilterInput, PurchaseQuery
 
 User = get_user_model()
 
@@ -126,9 +127,8 @@ class FilterResultUnion(graphene.Union):
     class Meta:
         types = (TruckType, SalesType, CustomerType, ProductType, ShipmentType)
 
-class Query(graphene.ObjectType):
+class Query(PurchaseQuery, graphene.ObjectType):
     filteredData = graphene.List(FilterResultUnion, filterInput=graphene.Argument(FilterInput))
-    # Add a direct products query for debugging
     products = graphene.List(ProductType)
 
     def resolve_products(self, info):
