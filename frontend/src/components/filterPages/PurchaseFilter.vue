@@ -41,7 +41,7 @@
         <p v-if="fieldErrors.endDate" class="mt-1 text-sm text-red-600">{{ fieldErrors.endDate }}</p>
       </div>
 
-      <!-- Vehicle and Customer -->
+      <!-- Vehicle and Supplier -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">شماره پلاک</label>
         <input 
@@ -51,50 +51,30 @@
         >
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">نام مشتری</label>
-        <input 
-          type="text" 
-          v-model="filters.customerName"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-      </div>
-
-      <!-- Supplier and Material -->
-      <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">نام تامین کننده</label>
         <input 
           type="text" 
           v-model="filters.supplierName"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.supplierName ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-        <p v-if="fieldErrors.supplierName" class="mt-1 text-sm text-red-600">{{ fieldErrors.supplierName }}</p>
       </div>
+
+      <!-- Material Information -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">نوع مواد</label>
         <input 
           type="text" 
           v-model="filters.materialType"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.materialType ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-        <p v-if="fieldErrors.materialType" class="mt-1 text-sm text-red-600">{{ fieldErrors.materialType }}</p>
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">نام مواد</label>
         <input 
           type="text" 
           v-model="filters.materialName"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.materialName ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-        <p v-if="fieldErrors.materialName" class="mt-1 text-sm text-red-600">{{ fieldErrors.materialName }}</p>
       </div>
 
       <!-- Price -->
@@ -103,12 +83,8 @@
         <input 
           type="number" 
           v-model="filters.pricePerKg"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.pricePerKg ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-        <p v-if="fieldErrors.pricePerKg" class="mt-1 text-sm text-red-600">{{ fieldErrors.pricePerKg }}</p>
       </div>
 
       <!-- Status -->
@@ -116,17 +92,13 @@
         <label class="block text-sm font-medium text-gray-700">وضعیت پرداخت</label>
         <select 
           v-model="filters.status"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.status ? 'border-red-500' : ''
-          ]"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
           <option value="">همه</option>
           <option value="Paid">پرداخت شده</option>
           <option value="Terms">نسیه</option>
           <option value="Cancelled">لغو شده</option>
         </select>
-        <p v-if="fieldErrors.status" class="mt-1 text-sm text-red-600">{{ fieldErrors.status }}</p>
       </div>
     </div>
 
@@ -153,8 +125,7 @@
 <script>
 import { gql } from '@apollo/client/core'
 import { apolloClient } from '@/apollo'
-import { validateForm, cleanFormData, handleEmptyResponse } from './filterValidate'
-import { getTranslationOptions } from '@/config/translations'
+import { validateForm, cleanFormData } from './filterValidate'
 
 export default {
   name: 'PurchaseFilter',
@@ -164,16 +135,11 @@ export default {
         startDate: '',
         endDate: '',
         status: '',
-        pricePerKg: '',
+        licenseNumber: '',
         supplierName: '',
         materialType: '',
         materialName: '',
-        invoiceStatus: '',
-        licenseNumber: '',
-        invoiceNumber: '',
-        documentInfo: '',
-        comments: '',
-        cancellationReason: ''
+        pricePerKg: ''
       },
       loading: false,
       error: null,
@@ -188,73 +154,51 @@ export default {
   methods: {
     translateValue(value, type) {
       const translations = {
-        invoiceStatus: {
-          'NA': 'بدون فاکتور',
-          'SENT': 'ارسال شده',
-          'RECEIVED': 'دریافت شده'
-        },
-        paymentStatus: {
-          'Terms': 'نسیه',
-          'Paid': 'پرداخت شده',
-          'Cancelled': 'لغو شده'
+        status: {
+          'PAID': 'پرداخت شده',
+          'TERMS': 'نسیه',
+          'CANCELLED': 'لغو شده'
         }
       }
 
-      const upperValue = value?.toUpperCase()
       const translationMap = translations[type] || {}
-      const translatedValue = Object.entries(translationMap).find(([key]) => 
-        key.toUpperCase() === upperValue
-      )?.[1]
-
-      return translatedValue || value
-    },
-    getStatusValue(persianStatus) {
-      const statusMap = {
-        'پرداخت شده': 'Paid',
-        'نسیه': 'Terms',
-        'لغو شده': 'Cancelled'
-      }
-      return statusMap[persianStatus] || persianStatus
+      return translationMap[value] || value
     },
     async loadPurchases() {
       this.loading = true
       try {
         const { data } = await apolloClient.query({
           query: gql`
-            query GetTermsPurchases {
-              filteredPurchases(filterInput: { 
-                status: "${this.filters.status || 'Paid'}"
-              }) {
+            query FilterPurchaseData($filterInput: PurchaseFilterInput) {
+              filteredPurchases(filterInput: $filterInput) {
                 id
                 date
                 status
-                receiveDate
-                paymentDate
-                licenseNumber
+                supplierName
                 materialType
                 materialName
-                supplierName
-                unit
-                quantity
-                quality
-                penalty
-                weight1
-                weight2
                 pricePerKg
-                vat
                 totalPrice
+                vat
                 extraCost
-                invoiceStatus
-                paymentDetails
-                invoiceNumber
                 documentInfo
                 comments
-                cancellationReason
                 username
                 logs
               }
             }
-          `
+          `,
+          variables: {
+            filterInput: {
+              status: this.filters.status || null,
+              startDate: null,
+              endDate: null,
+              supplierName: "",
+              materialType: "",
+              materialName: "",
+              pricePerKg: null
+            }
+          }
         })
         
         if (!data?.filteredPurchases) {
@@ -274,8 +218,7 @@ export default {
           )
           .map(purchase => ({
             ...purchase,
-            invoiceStatus: this.translateValue(purchase.invoiceStatus, 'invoiceStatus'),
-            paymentStatus: this.translateValue(purchase.paymentStatus, 'paymentStatus')
+            status: this.translateValue(purchase.status, 'status')
           }))
 
         this.purchases = validPurchases
@@ -296,16 +239,11 @@ export default {
         startDate: '',
         endDate: '',
         status: '',
-        pricePerKg: '',
+        licenseNumber: '',
         supplierName: '',
         materialType: '',
         materialName: '',
-        invoiceStatus: '',
-        licenseNumber: '',
-        invoiceNumber: '',
-        documentInfo: '',
-        comments: '',
-        cancellationReason: ''
+        pricePerKg: ''
       }
       this.fieldErrors = {}
       this.error = null
@@ -351,40 +289,36 @@ export default {
 
         const { data } = await apolloClient.query({
           query: gql`
-            query GetTermsPurchases {
-              filteredPurchases(filterInput: { 
-                status: "${cleanFilters.status || 'Paid'}"
-              }) {
+            query FilterPurchaseData($filterInput: PurchaseFilterInput) {
+              filteredPurchases(filterInput: $filterInput) {
                 id
                 date
                 status
-                receiveDate
-                paymentDate
-                licenseNumber
+                supplierName
                 materialType
                 materialName
-                supplierName
-                unit
-                quantity
-                quality
-                penalty
-                weight1
-                weight2
                 pricePerKg
-                vat
                 totalPrice
+                vat
                 extraCost
-                invoiceStatus
-                paymentDetails
-                invoiceNumber
                 documentInfo
                 comments
-                cancellationReason
                 username
                 logs
               }
             }
-          `
+          `,
+          variables: {
+            filterInput: {
+              status: cleanFilters.status || null,
+              startDate: cleanFilters.startDate || null,
+              endDate: cleanFilters.endDate || null,
+              supplierName: cleanFilters.supplierName || "",
+              materialType: cleanFilters.materialType || "",
+              materialName: cleanFilters.materialName || "",
+              pricePerKg: cleanFilters.pricePerKg ? Number(cleanFilters.pricePerKg) : null
+            }
+          }
         })
 
         if (!data?.filteredPurchases) {
@@ -402,13 +336,22 @@ export default {
             item.id
           )
           .filter(purchase => {
+            // Apply date filter
             const purchaseDate = new Date(purchase.date)
-            return purchaseDate >= startDate && purchaseDate <= endDate
+            const isInDateRange = purchaseDate >= startDate && purchaseDate <= endDate
+
+            // Apply other filters if they exist
+            const matchesLicense = !cleanFilters.licenseNumber || purchase.licenseNumber?.includes(cleanFilters.licenseNumber)
+            const matchesSupplier = !cleanFilters.supplierName || purchase.supplierName?.includes(cleanFilters.supplierName)
+            const matchesMaterialType = !cleanFilters.materialType || purchase.materialType?.includes(cleanFilters.materialType)
+            const matchesMaterialName = !cleanFilters.materialName || purchase.materialName?.includes(cleanFilters.materialName)
+            const matchesPrice = !cleanFilters.pricePerKg || purchase.pricePerKg === Number(cleanFilters.pricePerKg)
+
+            return isInDateRange && matchesLicense && matchesSupplier && matchesMaterialType && matchesMaterialName && matchesPrice
           })
           .map(purchase => ({
             ...purchase,
-            invoiceStatus: this.translateValue(purchase.invoiceStatus, 'invoiceStatus'),
-            paymentStatus: this.translateValue(purchase.paymentStatus, 'paymentStatus')
+            status: this.translateValue(purchase.status, 'status')
           }))
 
         this.filteredPurchases = validPurchases

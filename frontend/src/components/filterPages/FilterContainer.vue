@@ -436,42 +436,11 @@ export default {
       this.hasSearched = true
 
       try {
-        const filterInput = {
-          shipmentType: "Incoming",
-          shipmentStatus: filters.shipmentStatus || null,
-          shipmentLocation: filters.shipmentLocation || null,
-          licenseNumber: filters.licenseNumber || null,
-          customerName: filters.customerName || null,
-          supplierName: filters.supplierName || null,
-          materialType: filters.materialType || null,
-          materialName: filters.materialName || null,
-          invoiceStatus: filters.invoiceStatus || null,
-          paymentStatus: filters.paymentStatus || null,
-          startDate: filters.startDate || null,
-          endDate: filters.endDate || null
-        }
-
-        const response = await apolloClient.query({
-          query: PURCHASE_FILTER_QUERY,
-          variables: {
-            filterInput
-          },
-          fetchPolicy: 'network-only'
-        })
-
-        if (response?.data?.filteredData && 
-            Array.isArray(response.data.filteredData) && 
-            response.data.filteredData.length > 0) {
-          this.purchaseData = response.data.filteredData.filter(item => 
-            item && 
-            typeof item === 'object' && 
-            Object.keys(item).length > 0 &&
-            item.id &&
-            item.__typename === 'ShipmentType'
-          )
-        } else {
-          this.purchaseData = []
-        }
+        console.log('Received filters:', filters) // Debug log
+        // Since we're getting the filtered purchases directly from PurchaseFilter
+        // we don't need to make another API call
+        this.purchaseData = Array.isArray(filters) ? filters : []
+        console.log('Updated purchaseData:', this.purchaseData) // Debug log
       } catch (err) {
         this.error = 'خطا در دریافت اطلاعات'
         console.error('Filter error:', err)
