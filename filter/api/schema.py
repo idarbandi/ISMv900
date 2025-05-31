@@ -97,12 +97,12 @@ class FilterInput(graphene.InputObjectType):
     maxAmount = graphene.Float()
     # Product specific filters
     productReelNumber = graphene.String()
-    productWidth = graphene.Int()
+    productWidth = graphene.List(graphene.String)
     productGsm = graphene.Int()
     productLength = graphene.Int()
     productGrade = graphene.String()
     productStatus = graphene.String()
-    productLocation = graphene.String()
+    productLocation = graphene.List(graphene.String)
     productProfileName = graphene.String()
     minBreaks = graphene.Int()
     maxBreaks = graphene.Int()
@@ -163,7 +163,7 @@ class Query(PurchaseQuery, graphene.ObjectType):
             
             # Filter by width
             if filterInput.productWidth:
-                product_filter &= Q(width=filterInput.productWidth)
+                product_filter &= Q(width__in=filterInput.productWidth)
             
             # Filter by GSM
             if filterInput.productGsm:
@@ -183,7 +183,10 @@ class Query(PurchaseQuery, graphene.ObjectType):
             
             # Filter by location
             if filterInput.productLocation:
-                product_filter &= Q(location__icontains=filterInput.productLocation)
+                location_filter = Q()
+                for location in filterInput.productLocation:
+                    location_filter |= Q(location=location)
+                product_filter &= location_filter
             
             # Filter by profile name
             if filterInput.productProfileName:

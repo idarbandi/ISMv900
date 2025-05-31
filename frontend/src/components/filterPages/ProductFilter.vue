@@ -117,7 +117,7 @@
         <p v-if="fieldErrors.productLength" class="mt-1 text-sm text-red-600">{{ fieldErrors.productLength }}</p>
       </div>
       <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">GSM</label>
+        <label class="block text-sm font-medium text-gray-700">گرماژ</label>
         <input 
           type="number" 
           v-model="filters.productGsm"
@@ -149,14 +149,38 @@
       </div>
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700">موقعیت</label>
-        <input 
-          type="text" 
-          v-model="filters.productLocation"
-          :class="[
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-            fieldErrors.productLocation ? 'border-red-500' : ''
-          ]"
-        >
+        <div class="mt-1 relative location-dropdown">
+          <div 
+            @click="toggleLocationDropdown"
+            class="relative w-full cursor-pointer rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <span class="block truncate">
+              {{ selectedLocations.length ? selectedLocations.join(', ') : 'انتخاب کنید' }}
+            </span>
+            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+              <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </span>
+          </div>
+          <div v-if="isLocationDropdownOpen" class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div class="px-2 py-1">
+              <div v-for="option in locationOptions" :key="option.value" class="flex items-center">
+                <input
+                  type="checkbox"
+                  :id="'location-' + option.value"
+                  :value="option.value"
+                  v-model="filters.productLocation"
+                  class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  @click.stop
+                >
+                <label :for="'location-' + option.value" class="mr-2 block cursor-pointer py-2 text-sm text-gray-900">
+                  {{ option.label }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
         <p v-if="fieldErrors.productLocation" class="mt-1 text-sm text-red-600">{{ fieldErrors.productLocation }}</p>
       </div>
 
@@ -213,7 +237,7 @@ export default {
         productLength: '',
         productGsm: '',
         productStatus: '',
-        productLocation: '',
+        productLocation: [],
         productProfileName: '',
         productBreaks: '',
       },
@@ -229,7 +253,17 @@ export default {
         { value: '240', label: '2/40' },
         { value: '250', label: '2/50' }
       ],
-      isWidthDropdownOpen: false
+      isWidthDropdownOpen: false,
+      locationOptions: [
+        { value: 'Anbar_Salon_Tolid', label: 'انبار سالن تولید' },
+        { value: 'Anbar_Sangin', label: 'انبار سنگین' },
+        { value: 'Anbar_Koochak', label: 'انبار کوچک' },
+        { value: 'Anbar_Khamir_Ghadim', label: 'انبار خمیر قدیم' },
+        { value: 'Anbar_Khamir_Kordan', label: 'انبار خمیر کردن' },
+        { value: 'Anbar_Muhvateh_Kardan', label: 'انبار محوطه کردن' },
+        { value: 'Anbar_Akhal', label: 'انبار اخل' }
+      ],
+      isLocationDropdownOpen: false
     }
   },
   async created() {
@@ -240,6 +274,12 @@ export default {
       return this.filters.productWidth.map(width => {
         const option = this.widthOptions.find(opt => opt.value === width)
         return option ? option.label : width
+      })
+    },
+    selectedLocations() {
+      return this.filters.productLocation.map(location => {
+        const option = this.locationOptions.find(opt => opt.value === location)
+        return option ? option.label : location
       })
     }
   },
@@ -258,27 +298,34 @@ export default {
       try {
         const { data } = await apolloClient.query({
           query: gql`
-            query GetAllProducts {
-              products {
-                id
-                reelNumber
-                width
-                gsm
-                length
-                grade
-                status
-                location
-                profileName
-                breaks
-                receiveDate
-                lastDate
-                comments
-                qrCode
+            query GetAllProducts($filterInput: FilterInput) {
+              filteredData(filterInput: $filterInput) {
+                ... on ProductType {
+                  id
+                  reelNumber
+                  width
+                  gsm
+                  length
+                  grade
+                  status
+                  location
+                  profileName
+                  breaks
+                  receiveDate
+                  lastDate
+                  comments
+                  qrCode
+                }
               }
             }
-          `
+          `,
+          variables: {
+            filterInput: {
+              productLocation: this.filters.productLocation
+            }
+          }
         })
-        this.products = data.products.map(product => ({
+        this.products = data.filteredData.map(product => ({
           ...product,
           status: this.translateStatus(product.status)
         }))
@@ -300,7 +347,7 @@ export default {
         productLength: '',
         productGsm: '',
         productStatus: '',
-        productLocation: '',
+        productLocation: [],
         productProfileName: '',
         productBreaks: '',
       }
@@ -367,7 +414,9 @@ export default {
           if (cleanFilters.productLength && product.length !== Number(cleanFilters.productLength)) return false
           if (cleanFilters.productGsm && product.gsm !== Number(cleanFilters.productGsm)) return false
           if (cleanFilters.productStatus && product.status !== cleanFilters.productStatus) return false
-          if (cleanFilters.productLocation && !product.location.includes(cleanFilters.productLocation)) return false
+          if (cleanFilters.productLocation && cleanFilters.productLocation.length > 0) {
+            if (!product.location || !cleanFilters.productLocation.includes(product.location)) return false
+          }
           if (cleanFilters.productProfileName && !product.profileName.includes(cleanFilters.productProfileName)) return false
           if (cleanFilters.productBreaks && product.breaks !== Number(cleanFilters.productBreaks)) return false
 
@@ -400,13 +449,24 @@ export default {
       if (dropdown && !dropdown.contains(event.target)) {
         this.isWidthDropdownOpen = false
       }
+    },
+    toggleLocationDropdown() {
+      this.isLocationDropdownOpen = !this.isLocationDropdownOpen
+    },
+    handleLocationClickOutside(event) {
+      const dropdown = this.$el.querySelector('.location-dropdown')
+      if (dropdown && !dropdown.contains(event.target)) {
+        this.isLocationDropdownOpen = false
+      }
     }
   },
   mounted() {
     document.addEventListener('click', this.handleClickOutside)
+    document.addEventListener('click', this.handleLocationClickOutside)
   },
   beforeDestroy() {
     document.removeEventListener('click', this.handleClickOutside)
+    document.removeEventListener('click', this.handleLocationClickOutside)
   }
 }
 </script>
