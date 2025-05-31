@@ -98,23 +98,6 @@
         >
       </div>
 
-      <!-- Supplier and Material -->
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">نام تامین کننده</label>
-        <input 
-          type="text" 
-          v-model="filters.supplierName"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-      </div>
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700">نام مواد</label>
-        <input 
-          type="text" 
-          v-model="filters.materialName"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        >
-      </div>
 
       <!-- Price -->
       <div class="col-span-1">
@@ -185,7 +168,6 @@ export default {
         unloadLocation: '',
         licenseNumber: '',
         customerName: '',
-        supplierName: '',
         materialName: '',
         pricePerKg: '',
         invoiceStatus: '',
@@ -193,10 +175,12 @@ export default {
       },
       statusOptions: [
         { value: '', label: 'همه' },
-        { value: 'DELIVERED', label: 'تحویل داده شده' },
-        { value: 'IN_TRANSIT', label: 'در حال انتقال' },
-        { value: 'PENDING', label: 'در انتظار' },
-        { value: 'CANCELLED', label: 'لغو شده' }
+        { value: 'Registered', label: 'ثبت شده' },
+        { value: 'Loading', label: 'در حال بارگیری' },
+        { value: 'Loaded', label: 'بارگیری شده' },
+        { value: 'Office', label: 'دفتر' },
+        { value: 'Delivered', label: 'تحویل داده شده' },
+        { value: 'Cancelled', label: 'لغو شده' }
       ],
       locationOptions: [
         { value: '', label: 'همه' },
@@ -212,7 +196,11 @@ export default {
         { value: 'Anbar_Farangi', label: 'انبار فرنگی' }
       ],
       invoiceStatusOptions: getTranslationOptions('invoiceStatus'),
-      paymentStatusOptions: getTranslationOptions('paymentStatus'),
+      paymentStatusOptions: [
+        { value: '', label: 'همه' },
+        { value: 'Paid', label: 'پرداخت شده' },
+        { value: 'Terms', label: 'نسیه' }
+      ],
       loading: false,
       error: null,
       fieldErrors: {},
@@ -274,7 +262,9 @@ export default {
                 supplierName: null,
                 materialName: null,
                 invoiceStatus: null,
-                paymentStatus: null
+                paymentStatus: null,
+                startDate: null,
+                endDate: null
               }) {
                 ... on ShipmentType {
                   id
@@ -360,7 +350,6 @@ export default {
         unloadLocation: '',
         licenseNumber: '',
         customerName: '',
-        supplierName: '',
         materialName: '',
         pricePerKg: '',
         invoiceStatus: '',
@@ -487,7 +476,6 @@ export default {
           if (cleanFilters.unloadLocation && shipment.unloadLocation !== cleanFilters.unloadLocation) return false
           if (cleanFilters.licenseNumber && !shipment.licenseNumber.includes(cleanFilters.licenseNumber)) return false
           if (cleanFilters.customerName && !shipment.customerName.includes(cleanFilters.customerName)) return false
-          if (cleanFilters.supplierName && !shipment.supplierName.includes(cleanFilters.supplierName)) return false
           if (cleanFilters.materialName && !shipment.materialName.includes(cleanFilters.materialName)) return false
           if (cleanFilters.invoiceStatus && shipment.invoiceStatus !== cleanFilters.invoiceStatus) return false
           if (cleanFilters.paymentStatus && shipment.paymentStatus !== cleanFilters.paymentStatus) return false

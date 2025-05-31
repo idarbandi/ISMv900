@@ -178,13 +178,22 @@ export default {
                 materialType
                 materialName
                 pricePerKg
-                totalPrice
                 vat
-                extraCost
                 documentInfo
                 comments
                 username
                 logs
+                licenseNumber
+                weight1
+                weight2
+                receiveDate
+                unit
+                quantity
+                quality
+                penalty
+                invoiceStatus
+                paymentDate
+                paymentDetails
               }
             }
           `,
@@ -298,13 +307,22 @@ export default {
                 materialType
                 materialName
                 pricePerKg
-                totalPrice
                 vat
-                extraCost
                 documentInfo
                 comments
                 username
                 logs
+                licenseNumber
+                weight1
+                weight2
+                receiveDate
+                unit
+                quantity
+                quality
+                penalty
+                invoiceStatus
+                paymentDate
+                paymentDetails
               }
             }
           `,

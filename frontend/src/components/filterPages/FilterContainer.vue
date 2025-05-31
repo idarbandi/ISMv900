@@ -258,7 +258,7 @@ export default {
       currentFilterType: 'product',
       filterTypes: [
         { label: 'محصولات', value: 'product' },
-        { label: 'ارسال‌ها', value: 'shipment' },
+        { label: 'بارنامه ها', value: 'shipment' },
         { label: 'خریدها', value: 'purchase' }
       ],
       productData: [],
@@ -271,7 +271,7 @@ export default {
   },
   computed: {
     productTableHeaders() {
-      return ['نام پروفایل', 'شماره رول', 'عرض', 'GSM', 'طول', 'وضعیت', 'موقعیت', 'گرید', 'شکستگی']
+      return ['نام پروفایل', 'شماره رول', 'عرض', 'گرماژ', 'طول', 'وضعیت', 'موقعیت', 'گرید', 'پارگی']
     },
     shipmentTableHeaders() {
       return [
@@ -287,21 +287,14 @@ export default {
         'زمان خروج',
         'شماره پلاک',
         'نام مشتری',
-        'نام تامین کننده',
         'موقعیت تخلیه',
-        'واحد',
-        'تعداد',
-        'کیفیت',
-        'جریمه',
         'لیست رول‌ها',
         'نام پروفایل',
         'عرض',
         'کد فروش',
         'قیمت هر کیلو',
-        'نام مواد',
         'وضعیت فاکتور',
         'وضعیت پرداخت',
-        'اطلاعات سند',
         'توضیحات',
         'دلیل لغو',
         'نام کاربری',
@@ -311,18 +304,27 @@ export default {
     purchaseTableHeaders() {
       return [
         'تاریخ',
+        'وضعیت',
         'نام تامین کننده',
         'نوع مواد',
         'نام مواد',
         'قیمت هر کیلو',
-        'قیمت کل',
         'مالیات بر ارزش افزوده',
-        'هزینه اضافی',
-        'وضعیت پرداخت',
         'اطلاعات سند',
         'توضیحات',
         'نام کاربری',
-        'گزارش‌ها'
+        'گزارش‌ها',
+        'شماره پلاک',
+        'وزن اول',
+        'وزن دوم',
+        'تاریخ دریافت',
+        'واحد',
+        'تعداد',
+        'کیفیت',
+        'جریمه',
+        'وضعیت فاکتور',
+        'تاریخ پرداخت',
+        'جزئیات پرداخت'
       ]
     }
   },
@@ -354,12 +356,7 @@ export default {
         item.exitTime,
         item.licenseNumber,
         item.customerName,
-        item.supplierName,
         translate('location', item.unloadLocation),
-        item.unit,
-        item.quantity,
-        item.quality,
-        item.penalty,
         item.listOfReels,
         item.profileName,
         item.width,
@@ -378,6 +375,7 @@ export default {
     getPurchaseTableFields(item) {
       return [
         item.date,
+        item.status,
         item.supplierName,
         item.materialType,
         item.materialName,
@@ -385,11 +383,21 @@ export default {
         item.totalPrice,
         item.vat,
         item.extraCost,
-        item.paymentStatus,
         item.documentInfo,
         item.comments,
         item.username,
-        item.logs
+        item.logs,
+        item.licenseNumber,
+        item.weight1,
+        item.weight2,
+        item.receiveDate,
+        item.unit,
+        item.quantity,
+        item.quality,
+        item.penalty,
+        item.invoiceStatus,
+        item.paymentDate,
+        item.paymentDetails
       ]
     },
     async handleProductFilterApplied(filters) {
