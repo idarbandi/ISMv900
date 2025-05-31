@@ -121,6 +121,7 @@ class FilterInput(graphene.InputObjectType):
     extraCost = graphene.Int()
     invoiceStatus = graphene.String()
     paymentStatus = graphene.String()
+    unloadLocation = graphene.String()
 
 # Define the Union type
 class FilterResultUnion(graphene.Union):
@@ -263,7 +264,11 @@ class Query(PurchaseQuery, graphene.ObjectType):
                 shipment_filter &= Q(invoice_status=filterInput.invoiceStatus)
             if filterInput.paymentStatus:
                 shipment_filter &= Q(payment_status=filterInput.paymentStatus)
-            
+
+            # Filter by unload location
+            if filterInput.unloadLocation:
+                shipment_filter &= Q(unload_location__icontains=filterInput.unloadLocation)
+
             # Filter by date range
             if filterInput.startDate:
                 shipment_filter &= Q(date__gte=filterInput.startDate)

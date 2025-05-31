@@ -7,29 +7,13 @@ class PurchaseType(DjangoObjectType):
     class Meta:
         model = Purchases
         fields = (
-            'id', 'date', 'status', 'receiveDate', 'paymentDate',
-            'licenseNumber', 'materialType', 'materialName', 'supplierName',
+            'id', 'date', 'status', 'receive_date', 'payment_date',
+            'license_number', 'material_type', 'material_name', 'supplier_name',
             'unit', 'quantity', 'quality', 'penalty', 'weight1', 'weight2',
-            'netWeight', 'pricePerKg', 'vat', 'totalPrice', 'extraCost',
-            'invoiceStatus', 'paymentDetails', 'invoiceNumber', 'documentInfo',
-            'comments', 'cancellationReason', 'username', 'logs'
+            'net_weight', 'price_per_kg', 'vat', 'total_price', 'extra_cost',
+            'invoice_status', 'payment_details', 'invoice_number', 'document_info',
+            'comments', 'cancellation_reason', 'username', 'logs'
         )
-
-    # Convert snake_case to camelCase
-    receive_date = graphene.DateTime(source='receiveDate')
-    payment_date = graphene.DateTime(source='paymentDate')
-    license_number = graphene.String(source='licenseNumber')
-    material_type = graphene.String(source='materialType')
-    material_name = graphene.String(source='materialName')
-    supplier_name = graphene.String(source='supplierName')
-    price_per_kg = graphene.BigInt(source='pricePerKg')
-    total_price = graphene.BigInt(source='totalPrice')
-    extra_cost = graphene.BigInt(source='extraCost')
-    invoice_status = graphene.String(source='invoiceStatus')
-    payment_details = graphene.String(source='paymentDetails')
-    invoice_number = graphene.String(source='invoiceNumber')
-    document_info = graphene.String(source='documentInfo')
-    cancellation_reason = graphene.String(source='cancellationReason')
 
 class PurchaseFilterInput(graphene.InputObjectType):
     startDate = graphene.Date()

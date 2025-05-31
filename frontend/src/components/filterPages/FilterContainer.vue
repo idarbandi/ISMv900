@@ -452,7 +452,17 @@ export default {
 
       try {
         console.log('Received filters:', filters)
-        this.purchaseData = Array.isArray(filters) ? filters : []
+        
+        // Add filtering to remove empty or malformed objects
+        const validPurchaseData = Array.isArray(filters) ? filters.filter(item => 
+          item && 
+          typeof item === 'object' && 
+          Object.keys(item).length > 0 &&
+          item.id && // Ensure item has an ID
+          item.__typename === 'PurchaseType' // Ensure item is a PurchaseType
+        ) : []
+
+        this.purchaseData = validPurchaseData
         console.log('Updated purchaseData:', this.purchaseData)
       } catch (err) {
         this.error = 'خطا در دریافت اطلاعات'

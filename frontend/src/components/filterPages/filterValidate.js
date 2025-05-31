@@ -176,10 +176,16 @@ const cleanStringValue = (value) => {
 }
 
 // Helper function to handle empty object responses
-export const handleEmptyResponse = (data) => {
+export const handleEmptyResponse = (data, expectedTypename) => {
   if (!data) return []
   if (Array.isArray(data)) {
-    return data.filter(item => item && typeof item === 'object' && Object.keys(item).length > 0)
+    return data.filter(item => 
+      item && 
+      typeof item === 'object' && 
+      Object.keys(item).length > 0 &&
+      item.id && // Ensure item has an ID
+      (expectedTypename ? item.__typename === expectedTypename : true) // Optionally check for __typename
+    )
   }
   if (typeof data === 'object' && Object.keys(data).length === 0) {
     return []
@@ -276,9 +282,9 @@ export const validateForm = (form, type) => {
             errors[field] = result
           }
         } else {
-          const error = validateField(form[field], field, type)
-          if (error !== null) {
-            errors[field] = error
+        const error = validateField(form[field], field, type)
+        if (error !== null) {
+          errors[field] = error
           }
         }
       }

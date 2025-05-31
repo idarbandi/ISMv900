@@ -191,9 +191,15 @@ export default {
       ],
       unloadLocationOptions: [
         { value: '', label: 'همه' },
-        { value: 'Anbar_Muhvateh_Kardan', label: 'انبار محوطه کردان' },
-        { value: 'Anbar_Asli', label: 'انبار اصلی' },
-        { value: 'Anbar_Farangi', label: 'انبار فرنگی' }
+        { value: 'ANBAR_MUHVATEH_KARDAN', label: 'انبار محوطه کردان' },
+        { value: 'Anbar_Sangin', label: 'انبار محوطه سنگین' },
+        { value: 'Anbar_Khamir_Kordan', label: 'انبار خمیر کردان' },
+        { value: 'Anbar_Muhavateh_Homayoun', label: 'انبار محوطه همایون' },
+        { value: 'Anbar_Khamir_Ghadim', label: 'انبار خمیر قدیم' },
+        { value: 'Anbar_Salon_Tolid', label: 'انبار سالن تولید' },
+        { value: 'ANBAR_ASLI', label: 'انبار اصلی' },
+        { value: 'Anbar_PAK', label: 'انبار پاک' },
+        { value: 'ANBAR_FARANGI', label: 'انبار فرنگی' }
       ],
       invoiceStatusOptions: getTranslationOptions('invoiceStatus'),
       paymentStatusOptions: [
@@ -467,36 +473,95 @@ export default {
           return
         }
         
-        // Regular filtering for non-cancelled status
-        this.filteredShipments = this.shipments.filter(shipment => {
-          if (Object.keys(cleanFilters).length === 0) return true
+        // Construct filter input for filteredData query
+        const filterInput = {
+          shipmentType: 'Outgoing',
+          startDate: cleanFilters.startDate || null,
+          endDate: cleanFilters.endDate || null,
+          shipmentStatus: cleanFilters.shipmentStatus || null,
+          shipmentLocation: cleanFilters.shipmentLocation || null,
+          unloadLocation: cleanFilters.unloadLocation || null, // Add unloadLocation filter
+          licenseNumber: cleanFilters.licenseNumber || null,
+          customerName: cleanFilters.customerName || null,
+          materialName: cleanFilters.materialName || null,
+          pricePerKg: cleanFilters.pricePerKg ? Number(cleanFilters.pricePerKg) : null,
+          invoiceStatus: cleanFilters.invoiceStatus || null,
+          paymentStatus: cleanFilters.paymentStatus || null
+          // Add other filter fields as needed
+        }
 
-          if (cleanFilters.shipmentStatus && shipment.status !== cleanFilters.shipmentStatus) return false
-          if (cleanFilters.shipmentLocation && !shipment.location.includes(cleanFilters.shipmentLocation)) return false
-          if (cleanFilters.unloadLocation && shipment.unloadLocation !== cleanFilters.unloadLocation) return false
-          if (cleanFilters.licenseNumber && !shipment.licenseNumber.includes(cleanFilters.licenseNumber)) return false
-          if (cleanFilters.customerName && !shipment.customerName.includes(cleanFilters.customerName)) return false
-          if (cleanFilters.materialName && !shipment.materialName.includes(cleanFilters.materialName)) return false
-          if (cleanFilters.invoiceStatus && shipment.invoiceStatus !== cleanFilters.invoiceStatus) return false
-          if (cleanFilters.paymentStatus && shipment.paymentStatus !== cleanFilters.paymentStatus) return false
-          if (cleanFilters.pricePerKg && shipment.pricePerKg !== Number(cleanFilters.pricePerKg)) return false
-
-          if (cleanFilters.startDate || cleanFilters.endDate) {
-            const shipmentDate = new Date(shipment.date)
-            if (cleanFilters.startDate) {
-              const startDate = new Date(cleanFilters.startDate)
-              if (shipmentDate < startDate) return false
-            }
-            if (cleanFilters.endDate) {
-              const endDate = new Date(cleanFilters.endDate)
-              if (shipmentDate > endDate) return false
-            }
+        // Remove null or empty string values from filterInput
+        Object.keys(filterInput).forEach(key => {
+          if (filterInput[key] === null || filterInput[key] === '') {
+            delete filterInput[key];
           }
+        });
 
-          return true
+        // Use the filteredData query for other filters
+        const { data } = await apolloClient.query({
+          query: gql`
+            query FilterShipments($filterInput: FilterInput) {
+              filteredData(filterInput: $filterInput) {
+                ... on ShipmentType {
+                  id
+                  date
+                  status
+                  location
+                  receiveDate
+                  entryTime
+                  weight1Time
+                  weight2Time
+                  weight1
+                  weight2
+                  exitTime
+                  licenseNumber
+                  customerName
+                  supplierName
+                  unloadLocation
+                  unit
+                  quantity
+                  quality
+                  penalty
+                  listOfReels
+                  profileName
+                  width
+                  salesId
+                  pricePerKg
+                  materialName
+                  invoiceStatus
+                  paymentStatus
+                  documentInfo
+                  comments
+                  cancellationReason
+                  username
+                  logs
+                }
+              }
+            }
+          `,
+          variables: {
+            filterInput: filterInput
+          }
         })
 
-        this.$emit('filter-applied', this.filteredShipments)
+        // Handle potential null/empty response from the query
+        const validShipments = handleEmptyResponse(data?.filteredData, 'ShipmentType')
+
+        // Apply date range filter client-side as it's not consistently applied backend for filteredData
+        const finalFilteredShipments = validShipments.filter(shipment => {
+           const shipmentDate = new Date(shipment.date);
+           const startDateObj = cleanFilters.startDate ? new Date(cleanFilters.startDate) : null;
+           const endDateObj = cleanFilters.endDate ? new Date(cleanFilters.endDate) : null;
+
+           if (startDateObj && shipmentDate < startDateObj) return false;
+           if (endDateObj && shipmentDate > endDateObj) return false;
+
+           return true;
+        });
+
+        this.filteredShipments = finalFilteredShipments;
+        this.$emit('filter-applied', finalFilteredShipments);
+
       } catch (err) {
         this.error = err.message
         console.error('Filter error:', err)
