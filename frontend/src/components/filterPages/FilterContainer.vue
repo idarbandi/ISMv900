@@ -226,9 +226,10 @@ const SHIPMENT_FILTER_QUERY = gql`
 const PURCHASE_FILTER_QUERY = gql`
   query FilterPurchaseData($filterInput: FilterInput) {
     filteredData(filterInput: $filterInput) {
-      ... on ShipmentType {
+      ... on PurchaseType {
         id
         date
+        status
         supplierName
         materialType
         materialName
@@ -236,11 +237,21 @@ const PURCHASE_FILTER_QUERY = gql`
         totalPrice
         vat
         extraCost
-        paymentStatus
         documentInfo
         comments
         username
         logs
+        licenseNumber
+        weight1
+        weight2
+        receiveDate
+        unit
+        quantity
+        quality
+        penalty
+        invoiceStatus
+        paymentDate
+        paymentDetails
       }
     }
   }
@@ -309,7 +320,9 @@ export default {
         'نوع مواد',
         'نام مواد',
         'قیمت هر کیلو',
+        'قیمت کل',
         'مالیات بر ارزش افزوده',
+        'هزینه اضافی',
         'اطلاعات سند',
         'توضیحات',
         'نام کاربری',
@@ -319,12 +332,10 @@ export default {
         'وزن دوم',
         'تاریخ دریافت',
         'واحد',
-        'تعداد',
+        'مقدار',
         'کیفیت',
         'جریمه',
         'وضعیت فاکتور',
-        'تاریخ پرداخت',
-        'جزئیات پرداخت'
       ]
     }
   },
@@ -375,7 +386,7 @@ export default {
     getPurchaseTableFields(item) {
       return [
         item.date,
-        item.status,
+        translate('status', item.status),
         item.supplierName,
         item.materialType,
         item.materialName,
@@ -395,7 +406,7 @@ export default {
         item.quantity,
         item.quality,
         item.penalty,
-        item.invoiceStatus,
+        translate('invoiceStatus', item.invoiceStatus),
         item.paymentDate,
         item.paymentDetails
       ]
@@ -406,11 +417,9 @@ export default {
       this.hasSearched = true
 
       try {
-        console.log('Received filters:', filters) // Debug log
-        // Since we're getting the filtered products directly from ProductFilter
-        // we don't need to make another API call
+        console.log('Received filters:', filters)
         this.productData = Array.isArray(filters) ? filters : []
-        console.log('Updated productData:', this.productData) // Debug log
+        console.log('Updated productData:', this.productData)
       } catch (err) {
         this.error = 'خطا در دریافت اطلاعات'
         console.error('Filter error:', err)
@@ -425,11 +434,9 @@ export default {
       this.hasSearched = true
 
       try {
-        console.log('Received filters:', filters) // Debug log
-        // Since we're getting the filtered shipments directly from ShipmentFilter
-        // we don't need to make another API call
+        console.log('Received filters:', filters)
         this.shipmentData = Array.isArray(filters) ? filters : []
-        console.log('Updated shipmentData:', this.shipmentData) // Debug log
+        console.log('Updated shipmentData:', this.shipmentData)
       } catch (err) {
         this.error = 'خطا در دریافت اطلاعات'
         console.error('Filter error:', err)
@@ -444,11 +451,9 @@ export default {
       this.hasSearched = true
 
       try {
-        console.log('Received filters:', filters) // Debug log
-        // Since we're getting the filtered purchases directly from PurchaseFilter
-        // we don't need to make another API call
+        console.log('Received filters:', filters)
         this.purchaseData = Array.isArray(filters) ? filters : []
-        console.log('Updated purchaseData:', this.purchaseData) // Debug log
+        console.log('Updated purchaseData:', this.purchaseData)
       } catch (err) {
         this.error = 'خطا در دریافت اطلاعات'
         console.error('Filter error:', err)

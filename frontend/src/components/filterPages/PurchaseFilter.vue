@@ -169,7 +169,7 @@ export default {
       try {
         const { data } = await apolloClient.query({
           query: gql`
-            query FilterPurchaseData($filterInput: PurchaseFilterInput) {
+            query FilteredPurchases($filterInput: PurchaseFilterInput) {
               filteredPurchases(filterInput: $filterInput) {
                 id
                 date
@@ -178,7 +178,9 @@ export default {
                 materialType
                 materialName
                 pricePerKg
+                totalPrice
                 vat
+                extraCost
                 documentInfo
                 comments
                 username
@@ -298,7 +300,7 @@ export default {
 
         const { data } = await apolloClient.query({
           query: gql`
-            query FilterPurchaseData($filterInput: PurchaseFilterInput) {
+            query FilteredPurchases($filterInput: PurchaseFilterInput) {
               filteredPurchases(filterInput: $filterInput) {
                 id
                 date
